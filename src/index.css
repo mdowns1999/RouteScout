@@ -1,0 +1,107 @@
+/* Flexbox layout for header, main, and footer */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+:root {
+  --primaryColor: #2E4057;
+  --secondaryColor: #9cafb7;
+  --accentOne: #2E8B57;
+  --accentTwo: #FFD500;
+  --accentThree: #4281A4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body.dark-mode {
+  --primaryColor: #1A1A2E;
+  --secondaryColor: #2E2E2E;
+  --accentOne: #00B894;
+  --accentTwo: #FFD500;
+  --accentThree: #74B9FF;
+}
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: "Montserrat", sans-serif;
+  font-size: 20px;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+
+
+h1, h2, h3, h4, p, a, ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Source Sans 3", sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accentTwo);
+}
+
