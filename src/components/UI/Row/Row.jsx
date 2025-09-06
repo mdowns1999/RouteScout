@@ -3,11 +3,11 @@ import { css } from "@emotion/react";
 
 const guttersMap = {
   none: "0",
-  xs: "0.5rem", // ~4px
-  sm: "0.75rem", // ~8px
-  md: "1.5rem", // ~16px
-  lg: "2rem", // ~24px
-  xl: "2.5rem", // ~32px
+  xs: "1.5rem", 
+  sm: "1.75rem", 
+  md: "2.5rem", 
+  lg: "3rem", 
+  xl: "4rem", 
 };
 
 const RowCss = (gutterSize) => css`
