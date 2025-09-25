@@ -8,12 +8,30 @@ import Separator from "../../components/UI/Separator/Separator";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import MapIcon from "@mui/icons-material/Map";
+import Row from "../../components/UI/Row/Row";
 
 const cardWrapper = css`
   padding: 10px;
   border-radius: 5px;
   min-width: 250px;
   min-height: 275px;
+`;
+
+const whyChooseBoxCss = css`
+  background-color: #f0f0f0;
+`;
+
+const iconCircleCss = css`
+  text-align: center;
+  background-color: #a0a0a0ff;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
 `;
 
 const cardContent = [
@@ -36,6 +54,7 @@ const cardContent = [
       "Review smart suggestions and export your trip to Google or Apple Maps",
   },
 ];
+
 export default function LandingPage() {
   return (
     <div>
@@ -56,7 +75,7 @@ export default function LandingPage() {
               <Card key={card.title}>
                 <div css={cardWrapper}>
                   <CardContent sx={{ height: "100%" }}>
-                    <div style={{ textAlign: "center" }}>{card.icon}</div>
+                    <div css={iconCircleCss}>{card.icon}</div>
                     <Separator size="xs" />
                     <Heading level="h3" size="h6" centered>
                       {card.title}
@@ -70,6 +89,33 @@ export default function LandingPage() {
         </Grid>
         <Separator />
       </Container>
+      <section css={whyChooseBoxCss}>
+        <Container sx={{ padding: "20px" }}>
+          <Heading level="h2" size="h4" centered>
+            Why Choose RouteScout
+          </Heading>
+          <Paragraph centered>
+            Three simple steps to create your perfect adventure:
+          </Paragraph>
+          <Separator size="xs" />
+
+          <Row wrap alignX="center">
+            {cardContent.map((card) => (
+              <div key={card.title} style={{ maxWidth: "300px" }}>
+                <Row gutters="xs">
+                  <div style={{ alignSelf: "flex-start" }}>{card.icon}</div>
+                  <div>
+                    <Heading level="h3" size="h6">
+                      {card.title}
+                    </Heading>
+                    <Paragraph size="xs">{card.description}</Paragraph>
+                  </div>
+                </Row>
+              </div>
+            ))}
+          </Row>
+        </Container>
+      </section>
     </div>
   );
 }
