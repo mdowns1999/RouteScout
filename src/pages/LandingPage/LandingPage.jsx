@@ -1,66 +1,22 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import HeroBanner from "../../components/HeroBanner/HeroBanner";
-import { Card, CardContent, Container, Grid } from "@mui/material";
+import { Box, Button, Container } from "@mui/material";
 import Heading from "../../components/UI/Heading/Heading";
 import Paragraph from "../../components/UI/Paragraph/Paragraph";
 import Separator from "../../components/UI/Separator/Separator";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import MapIcon from "@mui/icons-material/Map";
-import Row from "../../components/UI/Row/Row";
-
-const cardWrapper = css`
-  padding: 10px;
-  border-radius: 5px;
-  min-width: 250px;
-  min-height: 275px;
-`;
+import CardGrid from "./components/CardGrid";
+import BenefitsRow from "./components/BenefitsRow";
 
 const whyChooseBoxCss = css`
   background-color: #f0f0f0;
 `;
 
-const iconCircleCss = css`
-  text-align: center;
-  background-color: #a0a0a0ff;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-`;
-
-const cardContent = [
-  {
-    icon: <LocationOnIcon fontSize="large" />,
-    title: "Set Your Route",
-    description:
-      "Enter your starting point and destination, plus any travel preferences",
-  },
-  {
-    icon: <StarBorderIcon fontSize="large" />,
-    title: "Choose Your Activities",
-    description:
-      "Select from categories like food, nature, history, and attractions",
-  },
-  {
-    icon: <MapIcon fontSize="large" />,
-    title: "Get Your Trip",
-    description:
-      "Review smart suggestions and export your trip to Google or Apple Maps",
-  },
-];
-
 export default function LandingPage() {
   return (
     <div>
       <HeroBanner />
-      <Separator />
-      <Container>
+      <Container sx={{ padding: "20px" }}>
         <Heading level="h2" size="h4" centered>
           How it Works
         </Heading>
@@ -68,27 +24,9 @@ export default function LandingPage() {
           Three simple steps to create your perfect adventure:
         </Paragraph>
         <Separator />
-
-        <Grid container spacing={3}>
-          {cardContent.map((card) => (
-            <Grid size={4}>
-              <Card key={card.title}>
-                <div css={cardWrapper}>
-                  <CardContent sx={{ height: "100%" }}>
-                    <div css={iconCircleCss}>{card.icon}</div>
-                    <Separator size="xs" />
-                    <Heading level="h3" size="h6" centered>
-                      {card.title}
-                    </Heading>
-                    <Paragraph centered>{card.description}</Paragraph>
-                  </CardContent>
-                </div>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-        <Separator />
+        <CardGrid />
       </Container>
+
       <section css={whyChooseBoxCss}>
         <Container sx={{ padding: "20px" }}>
           <Heading level="h2" size="h4" centered>
@@ -98,24 +36,25 @@ export default function LandingPage() {
             Three simple steps to create your perfect adventure:
           </Paragraph>
           <Separator size="xs" />
-
-          <Row wrap alignX="center">
-            {cardContent.map((card) => (
-              <div key={card.title} style={{ maxWidth: "300px" }}>
-                <Row gutters="xs">
-                  <div style={{ alignSelf: "flex-start" }}>{card.icon}</div>
-                  <div>
-                    <Heading level="h3" size="h6">
-                      {card.title}
-                    </Heading>
-                    <Paragraph size="xs">{card.description}</Paragraph>
-                  </div>
-                </Row>
-              </div>
-            ))}
-          </Row>
+          <BenefitsRow />
         </Container>
       </section>
+
+      <Container sx={{ padding: "20px" }}>
+        <div>
+          <Heading level="h2" size="h4" centered>
+            Ready to Plan your Adventure?
+          </Heading>
+          <Paragraph centered>
+            Begin your adventure by using RouteScout
+          </Paragraph>
+          <Box sx={{ textAlign: "center", py: 2 }}>
+            <Button variant="contained" size="small">
+              Start your Trip Now
+            </Button>
+          </Box>
+        </div>
+      </Container>
     </div>
   );
 }
