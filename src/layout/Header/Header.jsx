@@ -1,52 +1,28 @@
-/** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
-import { Link, NavLink } from "react-router-dom";
-import Image from "../../components/UI/Image/Image";
-import logo from "../../assets/react.svg";
-import Row from "../../components/UI/Row/Row";
-import { Container } from "@mui/material";
-import MobileMenu from "../../components/Menu/Menu";
+import { AppBar, Container, Stack, Toolbar, Link } from "@mui/material";
 import useIsMobile from "../../hooks/useIsMobile";
-
-const navListCss = css`
-  display: flex;
-  gap: 1em;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
-
-const headerLayout = css`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding:20px;
-`;
+import Heading from "../../components/UI/Heading/Heading";
+import Nav from "../Nav/Nav";
 
 
 export default function Header() {
   const isMobile = useIsMobile();
 
   return (
-    <header>
-      <Container maxWidth="xl">
-        <div css={headerLayout}>
-          <Row alignY="middle">
-            <Image to="/" src={logo} alt="Downs Portfolio Logo" />
-
-            {!isMobile && (
-              <nav>
-                <ul css={navListCss}>
-                  <NavLink to="/">Home</NavLink>
-                  <NavLink to="/trip">Plan Trip</NavLink>
-                </ul>
-              </nav>
-            )}
-          </Row>
-          {isMobile && <MobileMenu />}
-        </div>
+    <AppBar>
+      <Container>
+        <Toolbar>
+          <Stack
+          direction='row'
+          justifyContent='space-between'
+          alignItems='center'
+          width='100%'>
+            <Heading>My App</Heading>
+            <Stack direction='row' gap={3}>
+             <Nav/>
+            </Stack>
+          </Stack>
+        </Toolbar>
       </Container>
-    </header>
+    </AppBar>
   );
 }

@@ -1,18 +1,18 @@
 /* Custom CSS Variables for your app */
 :root {
-  --primaryColor: #2E4057;
+  --primaryColor: #2e4057;
   --secondaryColor: #9cafb7;
-  --accentOne: #2E8B57;
-  --accentTwo: #FFD500;
-  --accentThree: #4281A4;
+  --accentOne: #2e8b57;
+  --accentTwo: #ffd500;
+  --accentThree: #4281a4;
 }
 
 body.dark-mode {
-  --primaryColor: #1A1A2E;
-  --secondaryColor: #2E2E2E;
-  --accentOne: #00B894;
-  --accentTwo: #FFD500;
-  --accentThree: #74B9FF;
+  --primaryColor: #1a1a2e;
+  --secondaryColor: #2e2e2e;
+  --accentOne: #00b894;
+  --accentTwo: #ffd500;
+  --accentThree: #74b9ff;
 }
 
 /* Layout-specific styles (not covered by CssBaseline) */
@@ -31,7 +31,14 @@ body {
   font-family: "Montserrat", sans-serif !important;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: "Source Sans 3", sans-serif !important;
 }
 
+a {
+  color: black;
+  text-decoration: none;
+}
