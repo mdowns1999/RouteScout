@@ -8,10 +8,6 @@ import Separator from "../../components/UI/Separator/Separator";
 import CardGrid from "./components/CardGrid";
 import BenefitsRow from "./components/BenefitsRow";
 
-const whyChooseBoxCss = css`
-  background-color: #f0f0f0;
-`;
-
 export default function LandingPage() {
   return (
     <div>
@@ -27,7 +23,13 @@ export default function LandingPage() {
         <CardGrid />
       </Container>
 
-      <section css={whyChooseBoxCss}>
+      <Box
+        component="section"
+        sx={{
+          backgroundColor: 'background.paper',
+          py: 4,
+        }}
+      >
         <Container sx={{ padding: "20px" }}>
           <Heading level="h2" size="h4" centered>
             Why Choose RouteScout
@@ -38,7 +40,7 @@ export default function LandingPage() {
           <Separator size="xs" />
           <BenefitsRow />
         </Container>
-      </section>
+      </Box>
 
       <Container sx={{ padding: "20px" }}>
         <div>

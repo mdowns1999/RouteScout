@@ -10,7 +10,7 @@ const pages = [
   { name: "Plan Trip", id: "trip", path: "/trip" },
 ];
 
-function NavList({ ...props }) {
+function NavList({ sx, ...props }) {
   return (
     <Stack
       overflow="auto"
@@ -19,6 +19,16 @@ function NavList({ ...props }) {
       ml={{ xs: 3, sm: 0 }}
       mt={{ xs: 3, sm: 0 }}
       width={{ xs: "150px", sm: "initial" }}
+      sx={{
+        '& a': {
+          color: 'white',
+          textDecoration: 'none',
+          '&:hover': {
+            opacity: 0.8,
+          },
+        },
+        ...sx,
+      }}
       {...props}
     >
       {pages.map((page) => (

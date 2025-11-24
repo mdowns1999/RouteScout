@@ -1,16 +1,32 @@
-import { StrictMode } from "react";
+import { StrictMode, useState, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
-import theme from "./theme.jsx";
+import { getTheme } from "./theme.jsx";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { ThemeModeContext } from "./contexts/ThemeModeContext";
+
+function Root() {
+  const [mode, setMode] = useState('light');
+  
+  const toggleColorMode = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+  
+  const theme = useMemo(() => getTheme(mode), [mode]);
+  
+  return (
+    <ThemeModeContext.Provider value={{ mode, toggleColorMode }}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    </ThemeModeContext.Provider>
+  );
+}
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-      <CssBaseline />
-      <App />
-    </ThemeProvider>
+    <Root />
   </StrictMode>
 );

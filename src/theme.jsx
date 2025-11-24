@@ -1,17 +1,21 @@
 import { createTheme } from '@mui/material/styles';
 
-// Create a theme instance.
-const theme = createTheme({
+export const getTheme = (mode) => createTheme({
   cssVariables: true,
   palette: {
+    mode,
     primary: {
-      main: '#2E4057', // Your primaryColor
+      main: mode === 'light' ? '#2E4057' : '#9cafb7',
     },
     secondary: {
-      main: '#2E8B57', // Your accentOne
+      main: mode === 'light' ? '#2E8B57' : '#00B894',
     },
     error: {
       main: '#f44336',
+    },
+    background: {
+      default: mode === 'light' ? '#ffffff' : '#1A1A2E',
+      paper: mode === 'light' ? '#f5f5f5' : '#2E2E2E',
     },
   },
   typography: {
@@ -25,4 +29,5 @@ const theme = createTheme({
   },
 });
 
+const theme = getTheme('light');
 export default theme;
