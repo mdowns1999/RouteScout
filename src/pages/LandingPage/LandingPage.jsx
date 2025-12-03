@@ -12,7 +12,7 @@ export default function LandingPage() {
     <div>
       <HeroBanner />
       <LayoutBand spacing="lg">
-        <Heading level="h2" size="h4" centered>
+        <Heading level="h2" centered bold>
           How it Works
         </Heading>
         <Paragraph centered>
@@ -29,8 +29,8 @@ export default function LandingPage() {
         }}
       >
         <LayoutBand spacing="lg">
-          <Heading level="h2" size="h4" centered>
-            Why Choose RouteScout
+          <Heading level="h2" size="h4" centered bold>
+            Why Choose RouteScout?
           </Heading>
           <Paragraph centered>
             Three simple steps to create your perfect adventure:

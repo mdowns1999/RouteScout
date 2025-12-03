@@ -45,13 +45,13 @@ export default function BenefitsRow() {
   ]
 
   return (
-    <Row wrap alignX="center">
+    <Row wrap alignX="center" >
       {cardContent.map((card) => (
         <div key={card.title} style={{ maxWidth: "300px" }}>
           <Row gutters="xs">
             <div css={getIconBoxCss}>{card.icon}</div>
             <div>
-              <Heading level="h3" size="h6">
+              <Heading level="h3" size="h5">
                 {card.title}
               </Heading>
               <Paragraph size="xs">{card.description}</Paragraph>

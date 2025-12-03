@@ -5,16 +5,16 @@ function useParagraphFontSize(size = "md") {
   const theme = useTheme()
 
   const sizeMap = {
-    lg: theme.typography.body1.fontSize,
-    md: theme.typography.body2.fontSize,
-    sm: theme.typography.caption.fontSize,
-    xs: "0.75rem", // fallback or define in theme
+    lg: theme.typography.h6.fontSize,     
+    md: theme.typography.body1.fontSize,   
+    sm: theme.typography.body2.fontSize,   
+    xs: theme.typography.caption.fontSize, 
   }
 
-  return { fontSize: sizeMap[size] || theme.typography.body2.fontSize }
+  return { fontSize: sizeMap[size] || theme.typography.body1.fontSize }
 }
 
-const Paragraph = ({ centered = false, children, size, ...props }) => {
+const Paragraph = ({ centered = false, children, size = 'md', ...props }) => {
   const fontSizeStyles = useParagraphFontSize(size)
   return (
     <Typography

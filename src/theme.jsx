@@ -19,6 +19,7 @@ export const getTheme = (mode) => createTheme({
     },
   },
   typography: {
+    fontSize: 18,
     fontFamily: '"Montserrat", sans-serif',
     h1: { fontFamily: '"Source Sans 3", sans-serif' },
     h2: { fontFamily: '"Source Sans 3", sans-serif' },

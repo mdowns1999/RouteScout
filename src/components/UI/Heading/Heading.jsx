@@ -56,6 +56,7 @@ const Heading = ({
   size, // Visual size (optional, defaults to level)
   centered = false,
   children,
+  bold = false,
   ...props
 }) => {
   const variantMap = {
@@ -78,6 +79,9 @@ const Heading = ({
         component={semanticElement}
         gutterBottom
         css={centered ? headingCss : null}
+        sx={{ 
+          fontWeight: bold ? 700 : undefined 
+        }}
         {...props}
       >
         {children}

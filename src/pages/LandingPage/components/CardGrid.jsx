@@ -72,10 +72,10 @@ export default function CardGrid() {
               <CardContent sx={{ height: "100%" }}>
                 <div css={getIconCircleCss(theme)}>{card.icon}</div>
                 <Separator size="xs" />
-                <Heading level="h3" size="h6" centered>
+                <Heading level="h3" size="h4" centered>
                   {card.title}
                 </Heading>
-                <Paragraph centered>{card.description}</Paragraph>
+                <Paragraph centered size="sm">{card.description}</Paragraph>
               </CardContent>
             </div>
           </Card>

@@ -43,7 +43,7 @@ export default function HeroBanner() {
     <section css={heroCSS}>
       <Container>
         <div css={heroContentCSS}>
-          <Heading size="h2" centered>
+          <Heading size="h1" centered>
             Plan your Perfect Trip
           </Heading>
           <Paragraph centered>
