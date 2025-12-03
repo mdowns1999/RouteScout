@@ -10,7 +10,7 @@ const heroCSS = css`
     no-repeat center center;
   background-size: cover;
   width: 100%;
-  min-height: 60vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
   position: relative;

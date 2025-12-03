@@ -13,7 +13,7 @@ import { useThemeMode } from "../../contexts/ThemeModeContext";
 
 export default function Header() {
   const { mode, toggleColorMode } = useThemeMode();
-  
+
   return (
     <AppBar>
       <Container>
@@ -24,19 +24,19 @@ export default function Header() {
             alignItems="center"
             width="100%"
           >
-            <Heading>My App</Heading>
+            <Heading>Route Scout</Heading>
             <Stack direction="row" gap={3}>
               <Nav />
               <IconButton
                 aria-label="toggle dark mode"
                 size="small"
                 onClick={toggleColorMode}
-                sx={{ color: 'white' }}
+                sx={{ color: "white" }}
               >
-                {mode === 'dark' ? (
+                {mode === "dark" ? (
                   <NightlightRound fontSize="small" />
                 ) : (
-                   <Sunny fontSize="small" />
+                  <Sunny fontSize="small" />
                 )}
               </IconButton>
             </Stack>

@@ -7,14 +7,32 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ThemeModeContext } from "./contexts/ThemeModeContext";
 
 function Root() {
-  const [mode, setMode] = useState('light');
-  
-  const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  const getInitialMode = () => {
+    // Check localStorage first
+    const savedMode = localStorage.getItem("themeMode");
+    if (savedMode) {
+      return savedMode;
+    }
+
+    // Check system preference
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    return prefersDark ? "dark" : "light";
   };
-  
+
+  const [mode, setMode] = useState(getInitialMode);
+
+  const toggleColorMode = () => {
+    setMode((prevMode) => {
+      const newMode = prevMode === "light" ? "dark" : "light";
+      localStorage.setItem("themeMode", newMode);
+      return newMode;
+    });
+  };
+
   const theme = useMemo(() => getTheme(mode), [mode]);
-  
+
   return (
     <ThemeModeContext.Provider value={{ mode, toggleColorMode }}>
       <ThemeProvider theme={theme}>

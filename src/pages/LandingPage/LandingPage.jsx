@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import HeroBanner from "../../components/HeroBanner/HeroBanner";
-import { Box, Button, Container } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Heading from "../../components/UI/Heading/Heading";
 import Paragraph from "../../components/UI/Paragraph/Paragraph";
 import Separator from "../../components/UI/Separator/Separator";
+import LayoutBand from "../../components/UI/Layoutband/LayoutBand";
 import CardGrid from "./components/CardGrid";
 import BenefitsRow from "./components/BenefitsRow";
 
@@ -12,7 +13,7 @@ export default function LandingPage() {
   return (
     <div>
       <HeroBanner />
-      <Container sx={{ padding: "20px" }}>
+      <LayoutBand spacing="lg">
         <Heading level="h2" size="h4" centered>
           How it Works
         </Heading>
@@ -21,16 +22,15 @@ export default function LandingPage() {
         </Paragraph>
         <Separator />
         <CardGrid />
-      </Container>
+      </LayoutBand>
 
       <Box
         component="section"
         sx={{
-          backgroundColor: 'background.paper',
-          py: 4,
+          backgroundColor: "background.paper",
         }}
       >
-        <Container sx={{ padding: "20px" }}>
+        <LayoutBand spacing="lg">
           <Heading level="h2" size="h4" centered>
             Why Choose RouteScout
           </Heading>
@@ -39,24 +39,20 @@ export default function LandingPage() {
           </Paragraph>
           <Separator size="xs" />
           <BenefitsRow />
-        </Container>
+        </LayoutBand>
       </Box>
 
-      <Container sx={{ padding: "20px" }}>
-        <div>
-          <Heading level="h2" size="h4" centered>
-            Ready to Plan your Adventure?
-          </Heading>
-          <Paragraph centered>
-            Begin your adventure by using RouteScout
-          </Paragraph>
-          <Box sx={{ textAlign: "center", py: 2 }}>
-            <Button variant="contained" size="small">
-              Start your Trip Now
-            </Button>
-          </Box>
-        </div>
-      </Container>
+      <LayoutBand spacing="lg">
+        <Heading level="h2" size="h4" centered>
+          Ready to Plan your Adventure?
+        </Heading>
+        <Paragraph centered>Begin your adventure by using RouteScout</Paragraph>
+        <Box sx={{ textAlign: "center", py: 2 }}>
+          <Button variant="contained" size="small">
+            Start your Trip Now
+          </Button>
+        </Box>
+      </LayoutBand>
     </div>
   );
 }

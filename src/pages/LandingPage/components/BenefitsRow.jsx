@@ -1,9 +1,25 @@
+/** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
 import Heading from "../../../components/UI/Heading/Heading";
 import Paragraph from "../../../components/UI/Paragraph/Paragraph";
 import Row from "../../../components/UI/Row/Row";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import MapIcon from "@mui/icons-material/Map";
+
+const getIconBoxCss = (theme) => css`
+alignSelf: "flex-start"
+  text-align: center;
+  background-color: gray;
+  padding: 8px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  
+`;
 
 export default function BenefitsRow() {
   // TODO: REPLACE WITH ACTUAL CONTENT AND ICONS
@@ -33,7 +49,7 @@ export default function BenefitsRow() {
       {cardContent.map((card) => (
         <div key={card.title} style={{ maxWidth: "300px" }}>
           <Row gutters="xs">
-            <div style={{ alignSelf: "flex-start" }}>{card.icon}</div>
+            <div css={getIconBoxCss}>{card.icon}</div>
             <div>
               <Heading level="h3" size="h6">
                 {card.title}

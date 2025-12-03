@@ -10,10 +10,13 @@ const footerCss = css`
 `;
 
 export default function Footer() {
+  const date = new Date().getFullYear();
   return (
     <footer css={footerCss}>
       <Container>
-        <Paragraph centered>© 2023 RouteScout. All rights reserved.</Paragraph>
+        <Paragraph centered>
+          © {date} RouteScout. All rights reserved.
+        </Paragraph>
       </Container>
     </footer>
   );
