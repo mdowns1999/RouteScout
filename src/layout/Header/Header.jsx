@@ -3,9 +3,9 @@ import {
   Container,
   Stack,
   Toolbar,
-  Link,
   IconButton,
 } from "@mui/material"
+import MyLocationIcon from '@mui/icons-material/MyLocation'
 import Heading from "../../components/UI/Heading/Heading"
 import Nav from "../Nav/Nav"
 import { NightlightRound, Sunny } from "@mui/icons-material"
@@ -24,7 +24,10 @@ export default function Header() {
             alignItems="center"
             width="100%"
           >
-            <Heading>Route Scout</Heading>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <MyLocationIcon/>
+              <Heading style={{margin: 0}}>Route Scout</Heading>
+            </Stack>
             <Stack direction="row" gap={3}>
               <Nav />
               <IconButton
