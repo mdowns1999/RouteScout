@@ -1,21 +1,21 @@
-import { useTheme } from "@mui/material";
-import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material"
+import Typography from "@mui/material/Typography"
 
 function useParagraphFontSize(size = "md") {
-  const theme = useTheme();
+  const theme = useTheme()
 
   const sizeMap = {
     lg: theme.typography.body1.fontSize,
     md: theme.typography.body2.fontSize,
     sm: theme.typography.caption.fontSize,
     xs: "0.75rem", // fallback or define in theme
-  };
+  }
 
-  return { fontSize: sizeMap[size] || theme.typography.body2.fontSize };
+  return { fontSize: sizeMap[size] || theme.typography.body2.fontSize }
 }
 
 const Paragraph = ({ centered = false, children, size, ...props }) => {
-  const fontSizeStyles = useParagraphFontSize(size);
+  const fontSizeStyles = useParagraphFontSize(size)
   return (
     <Typography
       component="p"
@@ -26,7 +26,7 @@ const Paragraph = ({ centered = false, children, size, ...props }) => {
     >
       {children}
     </Typography>
-  );
-};
+  )
+}
 
-export default Paragraph;
+export default Paragraph

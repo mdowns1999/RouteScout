@@ -1,13 +1,11 @@
-/** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
-import HeroBanner from "../../components/HeroBanner/HeroBanner";
-import { Box, Button } from "@mui/material";
-import Heading from "../../components/UI/Heading/Heading";
-import Paragraph from "../../components/UI/Paragraph/Paragraph";
-import Separator from "../../components/UI/Separator/Separator";
-import LayoutBand from "../../components/UI/Layoutband/LayoutBand";
-import CardGrid from "./components/CardGrid";
-import BenefitsRow from "./components/BenefitsRow";
+import HeroBanner from "../../components/HeroBanner/HeroBanner"
+import { Box, Button } from "@mui/material"
+import Heading from "../../components/UI/Heading/Heading"
+import Paragraph from "../../components/UI/Paragraph/Paragraph"
+import Separator from "../../components/UI/Separator/Separator"
+import LayoutBand from "../../components/UI/Layoutband/LayoutBand"
+import CardGrid from "./components/CardGrid"
+import BenefitsRow from "./components/BenefitsRow"
 
 export default function LandingPage() {
   return (
@@ -54,5 +52,5 @@ export default function LandingPage() {
         </Box>
       </LayoutBand>
     </div>
-  );
+  )
 }

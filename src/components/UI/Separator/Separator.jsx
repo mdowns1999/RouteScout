@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
+import { css } from "@emotion/react"
 
 const spacingMap = {
   xs: css`
@@ -45,12 +45,12 @@ const spacingMap = {
       height: 6rem;
     }
   `,
-};
+}
 
 const separatorStyles = css`
   width: 100%;
   display: block;
-`;
+`
 
 const lineStyles = css`
   width: 100%;
@@ -58,7 +58,7 @@ const lineStyles = css`
   background-color: #e5e7eb;
   border: none;
   margin: 0;
-`;
+`
 
 export default function Separator({
   size = "md",
@@ -78,8 +78,8 @@ export default function Separator({
           ]}
         />
       </div>
-    );
+    )
   }
 
-  return <div css={[separatorStyles, spacingMap[size]]} {...props} />;
+  return <div css={[separatorStyles, spacingMap[size]]} {...props} />
 }

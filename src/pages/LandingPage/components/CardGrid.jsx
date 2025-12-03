@@ -1,12 +1,12 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
-import { Card, CardContent, Grid, useTheme } from "@mui/material";
-import Heading from "../../../components/UI/Heading/Heading";
-import Paragraph from "../../../components/UI/Paragraph/Paragraph";
-import Separator from "../../../components/UI/Separator/Separator";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import MapIcon from "@mui/icons-material/Map";
+import { css } from "@emotion/react"
+import { Card, CardContent, Grid, useTheme } from "@mui/material"
+import Heading from "../../../components/UI/Heading/Heading"
+import Paragraph from "../../../components/UI/Paragraph/Paragraph"
+import Separator from "../../../components/UI/Separator/Separator"
+import LocationOnIcon from "@mui/icons-material/LocationOn"
+import StarBorderIcon from "@mui/icons-material/StarBorder"
+import MapIcon from "@mui/icons-material/Map"
 
 const getIconCircleCss = (theme) => css`
   text-align: center;
@@ -23,17 +23,17 @@ const getIconCircleCss = (theme) => css`
   svg {
     color: ${theme.palette.mode === "dark" ? "#000000" : "#ffffff"};
   }
-`;
+`
 
 const cardWrapper = css`
   padding: 10px;
   border-radius: 5px;
   min-width: 250px;
   min-height: 275px;
-`;
+`
 
 export default function CardGrid() {
-  const theme = useTheme();
+  const theme = useTheme()
 
   const cardContent = [
     {
@@ -54,7 +54,7 @@ export default function CardGrid() {
       description:
         "Review smart suggestions and export your trip to Google or Apple Maps",
     },
-  ];
+  ]
 
   return (
     <Grid container spacing={8}>
@@ -82,5 +82,5 @@ export default function CardGrid() {
         </Grid>
       ))}
     </Grid>
-  );
+  )
 }

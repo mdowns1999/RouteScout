@@ -1,8 +1,8 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import LandingPage from "./pages/LandingPage/LandingPage";
-import TripPage from "./pages/TripPage/TripPage";
-import RootLayout from "./layout/Root";
-import ErrorPage from "./pages/ErrorPage/ErrorPage";
+import { RouterProvider, createBrowserRouter } from "react-router-dom"
+import LandingPage from "./pages/LandingPage/LandingPage"
+import TripPage from "./pages/TripPage/TripPage"
+import RootLayout from "./layout/Root"
+import ErrorPage from "./pages/ErrorPage/ErrorPage"
 
 const router = createBrowserRouter(
   [
@@ -17,10 +17,10 @@ const router = createBrowserRouter(
     },
   ],
   { basename: "/route-scout" }
-);
+)
 
 function App() {
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={router} />
 }
 
-export default App;
+export default App

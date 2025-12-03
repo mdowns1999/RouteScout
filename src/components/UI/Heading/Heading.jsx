@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
-import Typography from "@mui/material/Typography";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { css } from "@emotion/react"
+import Typography from "@mui/material/Typography"
+import { ThemeProvider, createTheme } from "@mui/material/styles"
 
 const headingTheme = createTheme({
   typography: {
@@ -45,11 +45,11 @@ const headingTheme = createTheme({
       xl: 1536,
     },
   },
-});
+})
 
 const headingCss = css`
   text-align: center;
-`;
+`
 
 const Heading = ({
   level = "h1", // Semantic level (h1, h2, etc.)
@@ -65,11 +65,11 @@ const Heading = ({
     h4: "h4",
     h5: "h5",
     h6: "h6",
-  };
+  }
 
   // Use size for visual appearance, level for semantic meaning
-  const visualVariant = variantMap[size || level];
-  const semanticElement = `${level}`;
+  const visualVariant = variantMap[size || level]
+  const semanticElement = `${level}`
 
   return (
     <ThemeProvider theme={headingTheme}>
@@ -83,7 +83,7 @@ const Heading = ({
         {children}
       </Typography>
     </ThemeProvider>
-  );
-};
+  )
+}
 
-export default Heading;
+export default Heading

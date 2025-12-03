@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
+import { css } from "@emotion/react"
 
 const guttersMap = {
   none: "0",
@@ -8,7 +8,7 @@ const guttersMap = {
   md: "2rem",
   lg: "3rem",
   xl: "4rem",
-};
+}
 
 const RowCss = (gutterSize) => css`
   display: flex;
@@ -42,7 +42,7 @@ const RowCss = (gutterSize) => css`
   &[data-align-y="bottom"] {
     align-items: flex-end;
   }
-`;
+`
 
 export default function Row({
   children,
@@ -51,7 +51,7 @@ export default function Row({
   gutters = "md",
   wrap = false,
 }) {
-  const gutterSize = guttersMap[gutters];
+  const gutterSize = guttersMap[gutters]
   return (
     <div
       css={RowCss(gutterSize)}
@@ -61,5 +61,5 @@ export default function Row({
     >
       {children}
     </div>
-  );
+  )
 }

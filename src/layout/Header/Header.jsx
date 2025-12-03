@@ -5,14 +5,14 @@ import {
   Toolbar,
   Link,
   IconButton,
-} from "@mui/material";
-import Heading from "../../components/UI/Heading/Heading";
-import Nav from "../Nav/Nav";
-import { NightlightRound, Sunny } from "@mui/icons-material";
-import { useThemeMode } from "../../contexts/ThemeModeContext";
+} from "@mui/material"
+import Heading from "../../components/UI/Heading/Heading"
+import Nav from "../Nav/Nav"
+import { NightlightRound, Sunny } from "@mui/icons-material"
+import { useThemeMode } from "../../contexts/ThemeModeContext"
 
 export default function Header() {
-  const { mode, toggleColorMode } = useThemeMode();
+  const { mode, toggleColorMode } = useThemeMode()
 
   return (
     <AppBar>
@@ -44,5 +44,5 @@ export default function Header() {
         </Toolbar>
       </Container>
     </AppBar>
-  );
+  )
 }

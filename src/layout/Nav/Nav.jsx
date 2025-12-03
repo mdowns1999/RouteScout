@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { Stack, Button, Drawer } from "@mui/material";
-import { Link } from "react-router-dom";
-import MenuIcon from "@mui/icons-material/Menu";
+import { useState } from "react"
+import { Stack, Button, Drawer } from "@mui/material"
+import { Link } from "react-router-dom"
+import MenuIcon from "@mui/icons-material/Menu"
 
 //https://muhimasri.com/blogs/mui-reponsive-navbar/
 
 const pages = [
   { name: "Home", id: "home", path: "/" },
   { name: "Plan Trip", id: "trip", path: "/trip" },
-];
+]
 
 function NavList({ sx, ...props }) {
   return (
@@ -37,14 +37,14 @@ function NavList({ sx, ...props }) {
         </Link>
       ))}
     </Stack>
-  );
+  )
 }
 
 export default function Nav() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
-  };
+    setOpen(newOpen)
+  }
   return (
     <>
       <Button
@@ -70,5 +70,5 @@ export default function Nav() {
         }}
       />
     </>
-  );
+  )
 }

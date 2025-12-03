@@ -1,16 +1,7 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
-import React from "react";
-import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-
-const baseImageStyles = css`
-  display: block;
-  max-width: 100%;
-  height: auto;
-  object-fit: cover;
-  transition: opacity 0.3s ease-in-out;
-`;
+import React from "react"
+import PropTypes from "prop-types"
+import { Link } from "react-router-dom"
 
 const Image = ({
   src,
@@ -21,14 +12,6 @@ const Image = ({
   external = false,
   ...props
 }) => {
-  const combinedStyles = [
-    baseImageStyles,
-    className &&
-      css`
-        ${className}
-      `,
-  ];
-
   const imgElement = (
     <img
       src={src}
@@ -38,7 +21,7 @@ const Image = ({
       loading="lazy"
       {...props}
     />
-  );
+  )
 
   if (to) {
     if (external) {
@@ -46,18 +29,18 @@ const Image = ({
         <a href={to} {...props} rel="noreferrer" target="_blank">
           {imgElement}
         </a>
-      );
+      )
     } else {
       return (
         <Link to={to} {...props}>
           {imgElement}
         </Link>
-      );
+      )
     }
   }
 
-  return imgElement;
-};
+  return imgElement
+}
 
 Image.propTypes = {
   src: PropTypes.string.isRequired,
@@ -65,6 +48,6 @@ Image.propTypes = {
   className: PropTypes.string,
   style: PropTypes.object,
   to: PropTypes.string,
-};
+}
 
-export default Image;
+export default Image

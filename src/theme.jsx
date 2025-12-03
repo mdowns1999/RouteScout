@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles'
 
 export const getTheme = (mode) => createTheme({
   cssVariables: true,
@@ -27,7 +27,7 @@ export const getTheme = (mode) => createTheme({
     h5: { fontFamily: '"Source Sans 3", sans-serif' },
     h6: { fontFamily: '"Source Sans 3", sans-serif' },
   },
-});
+})
 
-const theme = getTheme('light');
-export default theme;
+const theme = getTheme('light')
+export default theme

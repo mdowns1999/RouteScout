@@ -1,4 +1,4 @@
-import { Container } from "@mui/material";
+import { Container } from "@mui/material"
 
 const spacingMap = {
   none: 0,
@@ -7,7 +7,7 @@ const spacingMap = {
   md: "4rem",
   lg: "6rem",
   xl: "8rem",
-};
+}
 
 export default function LayoutBand({
   spacing = "md",
@@ -15,7 +15,7 @@ export default function LayoutBand({
   sx = {},
   ...props
 }) {
-  const paddingY = spacingMap[spacing] || spacingMap.md;
+  const paddingY = spacingMap[spacing] || spacingMap.md
 
   return (
     <Container
@@ -27,5 +27,5 @@ export default function LayoutBand({
     >
       {children}
     </Container>
-  );
+  )
 }
