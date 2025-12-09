@@ -5,6 +5,7 @@ import Paragraph from "../../components/UI/Paragraph/Paragraph"
 import useIsMobile from "../../hooks/useIsMobile"
 import { useState } from "react"
 import LocationsView from "../../components/LocationsView/LocationsView"
+import InterestsView from "../../components/InterestsView/InterestsView"
 
 const ProgressLabel = ({number, label, isMobile = true, filled=false}) => {
   return (
@@ -55,6 +56,7 @@ const [progress, setProgress] = useState(0)
         </div>
       
       <LocationsView />
+      <InterestsView/>
 
       <Stack direction="row" sx={spacingCSS}>
        {progress > 0 && (
