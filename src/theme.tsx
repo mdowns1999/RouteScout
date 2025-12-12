@@ -1,6 +1,7 @@
 import { createTheme } from '@mui/material/styles'
+import type { ThemeMode } from './contexts/ThemeModeContext'
 
-export const getTheme = (mode) => createTheme({
+export const getTheme = (mode: ThemeMode) => createTheme({
   cssVariables: true,
   palette: {
     mode,

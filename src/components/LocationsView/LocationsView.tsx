@@ -12,7 +12,6 @@ import {
   IconButton
 } from "@mui/material"
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"

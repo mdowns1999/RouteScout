@@ -78,9 +78,9 @@ const categories = [
 ]
 
 export default function InterestsView(){
-  const [selected, setSelected] = useState([])
+  const [selected, setSelected] = useState<string[]>([])
 
-  const handleSelect = (catId) => {
+  const handleSelect = (catId: string) => {
     setSelected(prev => 
       prev.includes(catId) 
         ? prev.filter(id => id !== catId)

@@ -1,16 +1,15 @@
-import { StrictMode, useState, useMemo } from "react"
-import { createRoot } from "react-dom/client"
-import App from "./App.jsx"
-import { getTheme } from "./theme.jsx"
+import { useState, useMemo } from "react"
+import App from "./App"
+import { getTheme } from "./theme"
 import { CssBaseline, ThemeProvider } from "@mui/material"
 import { ThemeModeContext } from "./contexts/ThemeModeContext"
-import "./index.css"
+import type { ThemeMode } from "./contexts/ThemeModeContext"
 
-function Root() {
-  const getInitialMode = () => {
+export default function Root() {
+  const getInitialMode = (): ThemeMode => {
     // Check localStorage first
     const savedMode = localStorage.getItem("themeMode")
-    if (savedMode) {
+    if (savedMode === 'light' || savedMode === 'dark') {
       return savedMode
     }
 
@@ -21,7 +20,7 @@ function Root() {
     return prefersDark ? "dark" : "light"
   }
 
-  const [mode, setMode] = useState(getInitialMode)
+  const [mode, setMode] = useState<ThemeMode>(getInitialMode)
 
   const toggleColorMode = () => {
     setMode((prevMode) => {
@@ -42,9 +41,3 @@ function Root() {
     </ThemeModeContext.Provider>
   )
 }
-
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Root />
-  </StrictMode>
-)

@@ -51,15 +51,27 @@ const headingCss = css`
   text-align: center;
 `
 
-const Heading = ({
-  level = "h1", // Semantic level (h1, h2, etc.)
-  size, // Visual size (optional, defaults to level)
+type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+
+interface HeadingProps {
+  level?: HeadingLevel
+  size?: HeadingLevel
+  centered?: boolean
+  children: React.ReactNode
+  bold?: boolean
+  style?: React.CSSProperties
+  [key: string]: unknown
+}
+
+const Heading: React.FC<HeadingProps> = ({
+  level = "h1",
+  size,
   centered = false,
   children,
   bold = false,
   ...props
 }) => {
-  const variantMap = {
+  const variantMap: Record<HeadingLevel, HeadingLevel> = {
     h1: "h1",
     h2: "h2",
     h3: "h3",
@@ -69,14 +81,13 @@ const Heading = ({
   }
 
   // Use size for visual appearance, level for semantic meaning
-  const visualVariant = variantMap[size || level]
-  const semanticElement = `${level}`
+  const visualVariant: HeadingLevel = variantMap[size || level]
 
   return (
     <ThemeProvider theme={headingTheme}>
       <Typography
         variant={visualVariant}
-        component={semanticElement}
+        component={level}
         gutterBottom
         css={centered ? headingCss : null}
         sx={{ 

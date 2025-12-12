@@ -60,12 +60,20 @@ const lineStyles = css`
   margin: 0;
 `
 
+type SeparatorSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'responsive' | 'section'
+
+interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  size?: SeparatorSize
+  showLine?: boolean
+  lineColor?: string
+}
+
 export default function Separator({
   size = "md",
   showLine = false,
   lineColor = "#e5e7eb",
   ...props
-}) {
+}: SeparatorProps) {
   if (showLine) {
     return (
       <div css={[separatorStyles, spacingMap[size]]} {...props}>

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Stack, Button, Drawer } from "@mui/material"
+import type { SxProps, Theme } from "@mui/material"
 import { Link } from "react-router-dom"
 import MenuIcon from "@mui/icons-material/Menu"
 
@@ -10,7 +11,12 @@ const pages = [
   { name: "Plan Trip", id: "trip", path: "/trip" },
 ]
 
-function NavList({ sx, ...props }) {
+interface NavListProps {
+  sx?: SxProps<Theme>
+  [key: string]: unknown
+}
+
+function NavList({ sx, ...props }: NavListProps) {
   return (
     <Stack
       overflow="auto"
@@ -41,8 +47,8 @@ function NavList({ sx, ...props }) {
 }
 
 export default function Nav() {
-  const [open, setOpen] = useState(false)
-  const toggleDrawer = (newOpen) => () => {
+  const [open, setOpen] = useState<boolean>(false)
+  const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen)
   }
   return (

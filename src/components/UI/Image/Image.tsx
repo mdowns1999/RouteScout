@@ -1,9 +1,17 @@
 /** @jsxImportSource @emotion/react */
 import React from "react"
-import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
 
-const Image = ({
+interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  src: string
+  alt: string
+  className?: string
+  style?: React.CSSProperties
+  to?: string
+  external?: boolean
+}
+
+const Image: React.FC<ImageProps> = ({
   src,
   alt,
   className,
@@ -26,13 +34,13 @@ const Image = ({
   if (to) {
     if (external) {
       return (
-        <a href={to} {...props} rel="noreferrer" target="_blank">
+        <a href={to} rel="noreferrer" target="_blank">
           {imgElement}
         </a>
       )
     } else {
       return (
-        <Link to={to} {...props}>
+        <Link to={to}>
           {imgElement}
         </Link>
       )
@@ -40,14 +48,6 @@ const Image = ({
   }
 
   return imgElement
-}
-
-Image.propTypes = {
-  src: PropTypes.string.isRequired,
-  alt: PropTypes.string.isRequired,
-  className: PropTypes.string,
-  style: PropTypes.object,
-  to: PropTypes.string,
 }
 
 export default Image

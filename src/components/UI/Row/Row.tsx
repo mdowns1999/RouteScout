@@ -10,7 +10,7 @@ const guttersMap = {
   xl: "4rem",
 }
 
-const RowCss = (gutterSize) => css`
+const RowCss = (gutterSize: string) => css`
   display: flex;
   gap: ${gutterSize};
 
@@ -44,13 +44,26 @@ const RowCss = (gutterSize) => css`
   }
 `
 
+type AlignX = 'start' | 'center' | 'end'
+type AlignY = 'top' | 'middle' | 'bottom'
+type Gutters = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type Wrap = boolean | 'reverse'
+
+interface RowProps {
+  children: React.ReactNode
+  alignX?: AlignX
+  alignY?: AlignY
+  gutters?: Gutters
+  wrap?: Wrap
+}
+
 export default function Row({
   children,
   alignX = "start",
   alignY = "middle",
   gutters = "md",
   wrap = false,
-}) {
+}: RowProps) {
   const gutterSize = guttersMap[gutters]
   return (
     <div

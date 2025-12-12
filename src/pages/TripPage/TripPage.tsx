@@ -7,7 +7,14 @@ import { useState } from "react"
 import LocationsView from "../../components/LocationsView/LocationsView"
 import InterestsView from "../../components/InterestsView/InterestsView"
 
-const ProgressLabel = ({number, label, isMobile = true, filled=false}) => {
+interface ProgressLabelProps {
+  number: string
+  label: string
+  isMobile?: boolean
+  filled?: boolean
+}
+
+const ProgressLabel: React.FC<ProgressLabelProps> = ({number, label, isMobile = true, filled=false}) => {
   return (
     <Stack direction='row' spacing={0.5} sx={{justifyContent: 'space-between', alignItems: 'center'}}>
         <Chip label={number}  size="small" color="primary" variant={filled ? "filled" : "outlined"}/>
