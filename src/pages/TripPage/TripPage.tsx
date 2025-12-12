@@ -6,6 +6,8 @@ import useIsMobile from "../../hooks/useIsMobile"
 import { useState } from "react"
 import LocationsView from "../../components/LocationsView/LocationsView"
 import InterestsView from "../../components/InterestsView/InterestsView"
+import SuggestedStops from "../../components/SuggestedStops/SuggestedStops"
+import TripSummary from "../../components/TripSummary/TripSummary"
 
 interface ProgressLabelProps {
   number: string
@@ -28,17 +30,17 @@ export default function TripPage() {
   const isMobile = useIsMobile()
 const [progress, setProgress] = useState(0)
 
-  const ProgressLabels = [
-    { number: "1", label: "Planning", filled: true, progress: 25 },
-    { number: "2", label: "In Progress", filled: false, progress: 50 },
-    { number: "3", label: "Completed", filled: false, progress: 75 },
-    { number: "4", label: "Reviewed", filled: false, progress: 100 },
+  const ProgressObj = [
+    { number: "1", label: "Planning", filled: true, progress: 25, component: <LocationsView /> },
+    { number: "2", label: "In Progress", filled: false, progress: 50, component: <InterestsView /> },
+    { number: "3", label: "Completed", filled: false, progress: 75 , component: <SuggestedStops /> },
+    { number: "4", label: "Reviewed", filled: false, progress: 100 , component: <TripSummary/>},
   ]
 
-  const progressNum = ProgressLabels[progress].progress
+  const progressNum = ProgressObj[progress].progress
 
   // Use space-between when both buttons exist, center when only one
-  const hasNext = progress < ProgressLabels.length - 1
+  const hasNext = progress < ProgressObj.length - 1
   const hasPrevious = progress > 0
   const spacingCSS = hasNext && hasPrevious 
     ? { justifyContent: 'space-between' } 
@@ -54,7 +56,7 @@ const [progress, setProgress] = useState(0)
           </Stack>
            <LinearProgress sx={{height: 10, borderRadius: 5}} variant="determinate" value={progressNum} />
           <Stack direction='row' sx={{justifyContent: 'space-between', padding: '5px'}}>
-{ProgressLabels.map((label) => (
+{ProgressObj.map((label) => (
   <ProgressLabel key={label.number} number={label.number} label={label.label} isMobile={isMobile} filled={label.filled} />
 ))}
 
@@ -62,8 +64,8 @@ const [progress, setProgress] = useState(0)
            
         </div>
       
-      <LocationsView />
-      <InterestsView/>
+      {/* Render current step component */}
+      {ProgressObj[progress].component}
 
       <Stack direction="row" sx={spacingCSS}>
        {progress > 0 && (
@@ -75,7 +77,7 @@ const [progress, setProgress] = useState(0)
           Previous
         </Button>
        )}
-        {progress < ProgressLabels.length - 1 && (
+        {progress < ProgressObj.length - 1 && (
           <Button 
             variant="contained" 
             color="primary"
