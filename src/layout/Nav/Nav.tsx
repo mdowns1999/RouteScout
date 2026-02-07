@@ -9,28 +9,39 @@ import MenuIcon from "@mui/icons-material/Menu"
 const pages = [
   { name: "Home", id: "home", path: "/" },
   { name: "Plan Trip", id: "trip", path: "/trip" },
+  { name: "My Trips", id: "my-trips", path: "/my-trips" },
+  { name: "Discover", id: "discover", path: "/discover" },
+  { name: "Help", id: "help", path: "/help" },
 ]
 
 interface NavListProps {
   sx?: SxProps<Theme>
+  onLinkClick?: () => void
+  inDrawer?: boolean
   [key: string]: unknown
 }
 
-function NavList({ sx, ...props }: NavListProps) {
+function NavList({ sx, onLinkClick, inDrawer = false, ...props }: NavListProps) {
   return (
     <Stack
       overflow="auto"
-      direction={{ xs: "column", sm: "row" }}
-      gap={3}
-      ml={{ xs: 3, sm: 0 }}
-      mt={{ xs: 3, sm: 0 }}
-      width={{ xs: "150px", sm: "initial" }}
+      direction={inDrawer ? "column" : { xs: "column", md: "row" }}
+      gap={inDrawer ? 2 : { xs: 2, md: 2, lg: 3 }}
+      ml={inDrawer ? 0 : { xs: 0, md: 0 }}
+      mt={inDrawer ? 0 : { xs: 0, md: 0 }}
+      p={inDrawer ? 3 : { xs: 3, md: 0 }}
+      width={inDrawer ? "100%" : { xs: "100%", md: "initial" }}
       sx={{
         '& a': {
           color: 'white',
           textDecoration: 'none',
+          padding: inDrawer ? '12px 16px' : { xs: '12px 16px', md: '0' },
+          borderRadius: inDrawer ? '4px' : { xs: '4px', md: '0' },
+          transition: 'all 0.2s',
+          display: 'block',
           '&:hover': {
-            opacity: 0.8,
+            opacity: inDrawer ? 1 : { xs: 1, md: 0.8 },
+            backgroundColor: inDrawer ? 'rgba(255, 255, 255, 0.1)' : { xs: 'rgba(255, 255, 255, 0.1)', md: 'transparent' },
           },
         },
         ...sx,
@@ -38,7 +49,7 @@ function NavList({ sx, ...props }: NavListProps) {
       {...props}
     >
       {pages.map((page) => (
-        <Link to={page.path} key={page.id}>
+        <Link to={page.path} key={page.id} onClick={onLinkClick}>
           {page.name}
         </Link>
       ))}
@@ -51,12 +62,17 @@ export default function Nav() {
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen)
   }
+
+  const handleLinkClick = () => {
+    setOpen(false)
+  }
+
   return (
     <>
       <Button
         variant="text"
         onClick={toggleDrawer(true)}
-        sx={{ color: "white", display: { xs: "flex", sm: "none" } }}
+        sx={{ color: "white", display: { xs: "flex", md: "none" } }}
       >
         <MenuIcon />
       </Button>
@@ -65,14 +81,19 @@ export default function Nav() {
         onClose={toggleDrawer(false)}
         anchor="right"
         sx={{
-          display: { xs: "inherit", sm: "none" },
+          display: { xs: "inherit", md: "none" },
+          "& .MuiDrawer-paper": {
+            backgroundColor: "primary.main",
+            width: "250px",
+            pt: 2,
+          },
         }}
       >
-        <NavList />
+        <NavList onLinkClick={handleLinkClick} inDrawer />
       </Drawer>
       <NavList
         sx={{
-          display: { xs: "none", sm: "inherit" },
+          display: { xs: "none", md: "inherit" },
         }}
       />
     </>

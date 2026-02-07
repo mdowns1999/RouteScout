@@ -5,18 +5,21 @@ import Paragraph from "../../components/UI/Paragraph/Paragraph"
 import Separator from "../../components/UI/Separator/Separator"
 import LayoutBand from "../../components/UI/Layoutband/LayoutBand"
 import CardGrid from "./components/CardGrid"
-import BenefitsRow from "./components/BenefitsRow"
+import FeatureGrid from "./components/FeatureGrid"
+import { useNavigate } from "react-router-dom"
 
 export default function LandingPage() {
+  const navigate = useNavigate()
+
   return (
     <div>
       <HeroBanner />
-      <LayoutBand spacing="lg">
+      <LayoutBand spacing="md">
         <Heading level="h2" centered bold>
           How it Works
         </Heading>
         <Paragraph centered>
-          Three simple steps to create your perfect adventure:
+          Three simple steps to create your perfect road trip adventure
         </Paragraph>
         <Separator />
         <CardGrid />
@@ -28,26 +31,33 @@ export default function LandingPage() {
           backgroundColor: "background.paper",
         }}
       >
-        <LayoutBand spacing="lg">
+        <LayoutBand spacing="md">
           <Heading level="h2" size="h4" centered bold>
             Why Choose RouteScout?
           </Heading>
           <Paragraph centered>
-            Three simple steps to create your perfect adventure:
+            Everything you need to plan and execute the perfect road trip
           </Paragraph>
           <Separator size="xs" />
-          <BenefitsRow />
+          <FeatureGrid />
         </LayoutBand>
       </Box>
 
-      <LayoutBand spacing="lg">
+      <LayoutBand spacing="md">
         <Heading level="h2" size="h4" centered>
-          Ready to Plan your Adventure?
+          Ready to Plan Your Adventure?
         </Heading>
-        <Paragraph centered>Begin your adventure by using RouteScout</Paragraph>
+        <Paragraph centered>
+          Join thousands of travelers who have discovered amazing places with
+          RouteScout
+        </Paragraph>
         <Box sx={{ textAlign: "center", py: 2 }}>
-          <Button variant="contained" size="small">
-            Start your Trip Now
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => navigate("/trip")}
+          >
+            Start Your Trip Now
           </Button>
         </Box>
       </LayoutBand>

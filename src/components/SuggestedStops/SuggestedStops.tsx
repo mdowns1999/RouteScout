@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { CardMedia, Card, CardContent, Box } from "@mui/material"
+import { CardMedia, Card, CardContent, Box, Stack } from "@mui/material"
 import Checkbox from '@mui/material/Checkbox'
+import RouteIcon from '@mui/icons-material/Route'
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import testImg from '../../assets/images/test.png'
@@ -28,6 +29,15 @@ export default function SuggestedStops() {
   const [checked, setChecked] = useState(false)
   
   return (
+<>
+<Card>
+  <Stack direction="row" spacing={2} alignItems="center">
+    <RouteIcon />
+    <Heading level="h1" size="h4">
+    Your Route
+  </Heading>
+  </Stack>
+</Card>
     <Card sx={cardStyles}>
       <CardMedia
         component="img"
@@ -50,5 +60,6 @@ export default function SuggestedStops() {
         </Box>
       </CardContent>
     </Card>
+</>
   )
 }

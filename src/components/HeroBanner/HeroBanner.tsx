@@ -3,7 +3,8 @@ import { css } from "@emotion/react"
 
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
-import { Container } from "@mui/material"
+import { Container, Button, Box } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 
 const heroCSS = css`
   background: url("https://images.unsplash.com/photo-1755150209904-2b1ebc0c4b66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY2VuaWMlMjByb2FkJTIwdHJpcCUyMGhpZ2h3YXklMjBtb3VudGFpbnN8ZW58MXx8fHwxNzU2MTM3NDY1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral")
@@ -39,16 +40,29 @@ const heroContentCSS = css`
 `
 
 export default function HeroBanner() {
+  const navigate = useNavigate()
+
   return (
     <section css={heroCSS}>
       <Container>
         <div css={heroContentCSS}>
           <Heading size="h1" centered>
-            Plan your Perfect Trip
+            Plan Your Perfect Road Trip
           </Heading>
           <Paragraph centered>
-            Discover amazing destinations and create unforgettable memories
+            Create unforgettable journeys with smart stop suggestions,
+            interactive maps, and seamless export to your favorite navigation
+            apps
           </Paragraph>
+          <Box sx={{ textAlign: "center", mt: 3 }}>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate("/trip")}
+            >
+              Start Planning Your Trip
+            </Button>
+          </Box>
         </div>
       </Container>
     </section>

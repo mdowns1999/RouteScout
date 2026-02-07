@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react"
-import { Card, CardContent, Grid, useTheme } from "@mui/material"
+import { Card, CardContent, Grid, useTheme, type Theme } from "@mui/material"
 import Heading from "../../../components/UI/Heading/Heading"
 import Paragraph from "../../../components/UI/Paragraph/Paragraph"
 import Separator from "../../../components/UI/Separator/Separator"
@@ -8,7 +8,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn"
 import StarBorderIcon from "@mui/icons-material/StarBorder"
 import MapIcon from "@mui/icons-material/Map"
 
-const getIconCircleCss = (theme) => css`
+const getIconCircleCss = (theme: Theme) => css`
   text-align: center;
   background-color: ${theme.palette.mode === "dark" ? "#ffffff" : "#000000"};
   width: 60px;
@@ -61,6 +61,7 @@ export default function CardGrid() {
       {cardContent.map((card) => (
         <Grid size={{ sm: 12, md: 4 }} key={card.title}>
           <Card
+            elevation={2}
             sx={{
               backgroundColor: (theme) =>
                 theme.palette.mode === "dark" ? "#000000" : "#ffffff",
