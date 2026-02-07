@@ -1,8 +1,6 @@
-import { useState } from "react"
-import { Stack, Button, Drawer } from "@mui/material"
+import { Stack, Button, Drawer, Divider } from "@mui/material"
 import type { SxProps, Theme } from "@mui/material"
 import { Link } from "react-router-dom"
-import MenuIcon from "@mui/icons-material/Menu"
 
 //https://muhimasri.com/blogs/mui-reponsive-navbar/
 
@@ -15,13 +13,18 @@ const pages = [
 ]
 
 interface NavListProps {
-  sx?: SxProps<Theme>
-  onLinkClick?: () => void
-  inDrawer?: boolean
-  [key: string]: unknown
+  sx?: SxProps<Theme>;
+  onLinkClick?: () => void;
+  inDrawer?: boolean;
+  [key: string]: unknown;
 }
 
-function NavList({ sx, onLinkClick, inDrawer = false, ...props }: NavListProps) {
+function NavList({
+  sx,
+  onLinkClick,
+  inDrawer = false,
+  ...props
+}: NavListProps) {
   return (
     <Stack
       overflow="auto"
@@ -32,16 +35,18 @@ function NavList({ sx, onLinkClick, inDrawer = false, ...props }: NavListProps) 
       p={inDrawer ? 3 : { xs: 3, md: 0 }}
       width={inDrawer ? "100%" : { xs: "100%", md: "initial" }}
       sx={{
-        '& a': {
-          color: 'white',
-          textDecoration: 'none',
-          padding: inDrawer ? '12px 16px' : { xs: '12px 16px', md: '0' },
-          borderRadius: inDrawer ? '4px' : { xs: '4px', md: '0' },
-          transition: 'all 0.2s',
-          display: 'block',
-          '&:hover': {
+        "& a": {
+          color: "white",
+          textDecoration: "none",
+          padding: inDrawer ? "12px 16px" : { xs: "12px 16px", md: "0" },
+          borderRadius: inDrawer ? "4px" : { xs: "4px", md: "0" },
+          transition: "all 0.2s",
+          display: "block",
+          "&:hover": {
             opacity: inDrawer ? 1 : { xs: 1, md: 0.8 },
-            backgroundColor: inDrawer ? 'rgba(255, 255, 255, 0.1)' : { xs: 'rgba(255, 255, 255, 0.1)', md: 'transparent' },
+            backgroundColor: inDrawer
+              ? "rgba(255, 255, 255, 0.1)"
+              : { xs: "rgba(255, 255, 255, 0.1)", md: "transparent" },
           },
         },
         ...sx,
@@ -57,28 +62,29 @@ function NavList({ sx, onLinkClick, inDrawer = false, ...props }: NavListProps) 
   )
 }
 
-export default function Nav() {
-  const [open, setOpen] = useState<boolean>(false)
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen)
+interface NavProps {
+  drawerOpen?: boolean;
+  onDrawerToggle?: (open: boolean) => void;
+}
+
+export default function Nav({ drawerOpen = false, onDrawerToggle }: NavProps) {
+  const handleLinkClick = () => {
+    if (onDrawerToggle) {
+      onDrawerToggle(false)
+    }
   }
 
-  const handleLinkClick = () => {
-    setOpen(false)
+  const handleDrawerClose = () => {
+    if (onDrawerToggle) {
+      onDrawerToggle(false)
+    }
   }
 
   return (
     <>
-      <Button
-        variant="text"
-        onClick={toggleDrawer(true)}
-        sx={{ color: "white", display: { xs: "flex", md: "none" } }}
-      >
-        <MenuIcon />
-      </Button>
       <Drawer
-        open={open}
-        onClose={toggleDrawer(false)}
+        open={drawerOpen}
+        onClose={handleDrawerClose}
         anchor="right"
         sx={{
           display: { xs: "inherit", md: "none" },
@@ -89,6 +95,24 @@ export default function Nav() {
           },
         }}
       >
+        <Stack px={3} pb={3}>
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={handleLinkClick}
+            sx={{
+              color: "white",
+              borderColor: "white",
+              "&:hover": {
+                borderColor: "white",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+          >
+            Sign In
+          </Button>
+        </Stack>
+        <Divider sx={{ my: 2, borderColor: "rgba(255, 255, 255, 0.2)" }} />
         <NavList onLinkClick={handleLinkClick} inDrawer />
       </Drawer>
       <NavList

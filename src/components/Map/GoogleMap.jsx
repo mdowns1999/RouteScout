@@ -1,6 +1,6 @@
 import { Card, CardMedia } from "@mui/material";
 
-export default function Map() {
+export default function GoogleMap() {
   return (
     <div className="map">
       <Card sx={{ maxWidth: 345 }}>
