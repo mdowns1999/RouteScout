@@ -11,11 +11,7 @@ import MyLocationIcon from "@mui/icons-material/MyLocation"
 import MenuIcon from "@mui/icons-material/Menu"
 import Heading from "../../components/UI/Heading/Heading"
 import Nav from "../Nav/Nav"
-import {
-  NightlightRound,
-  Sunny,
-  HelpOutline,
-} from "@mui/icons-material"
+import { NightlightRound, Sunny, HelpOutline } from "@mui/icons-material"
 import { useThemeMode } from "../../contexts/ThemeModeContext"
 import { useState } from "react"
 

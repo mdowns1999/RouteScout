@@ -8,33 +8,71 @@ import LocationsView from "../../components/LocationsView/LocationsView"
 import InterestsView from "../../components/InterestsView/InterestsView"
 import SuggestedStops from "../../components/SuggestedStops/SuggestedStops"
 import TripSummary from "../../components/TripSummary/TripSummary"
+import Separator from "../../components/UI/Separator/Separator"
 
 interface ProgressLabelProps {
-  number: string
-  label: string
-  isMobile?: boolean
-  filled?: boolean
+  number: string;
+  label: string;
+  isMobile?: boolean;
+  filled?: boolean;
 }
 
-const ProgressLabel: React.FC<ProgressLabelProps> = ({number, label, isMobile = true, filled=false}) => {
+const ProgressLabel: React.FC<ProgressLabelProps> = ({
+  number,
+  label,
+  isMobile = true,
+  filled = false,
+}) => {
   return (
-    <Stack direction='row' spacing={0.5} sx={{justifyContent: 'space-between', alignItems: 'center'}}>
-        <Chip label={number}  size="small" color="primary" variant={filled ? "filled" : "outlined"}/>
-        {!isMobile && <Paragraph size='xs'>{label}</Paragraph>}
+    <Stack
+      direction="row"
+      spacing={0.5}
+      sx={{ justifyContent: "space-between", alignItems: "center" }}
+    >
+      <Chip
+        label={number}
+        size="small"
+        color="primary"
+        variant={filled ? "filled" : "outlined"}
+      />
+      {!isMobile && <Paragraph size="xs">{label}</Paragraph>}
     </Stack>
   )
 }
 
-
 export default function TripPage() {
   const isMobile = useIsMobile()
-const [progress, setProgress] = useState(0)
+  const [progress, setProgress] = useState(0)
 
   const ProgressObj = [
-    { number: "1", label: "Planning", filled: true, progress: 25, component: <LocationsView /> },
-    { number: "2", label: "In Progress", filled: false, progress: 50, component: <InterestsView /> },
-    { number: "3", label: "Completed", filled: false, progress: 75 , component: <SuggestedStops /> },
-    { number: "4", label: "Reviewed", filled: false, progress: 100 , component: <TripSummary/>},
+    {
+      number: "1",
+      label: "Planning",
+      filled: true,
+      progress: 25,
+      component: <LocationsView />,
+    },
+    {
+      number: "2",
+      label: "In Progress",
+      filled: false,
+      progress: 50,
+      component: <InterestsView />,
+    },
+    {
+      number: "3",
+      label: "Completed",
+      filled: false,
+      progress: 75,
+      component: <SuggestedStops />,
+    },
+    {
+      number: "4",
+      label: "Reviewed",
+      filled: false,
+      progress: 100,
+      component: <TripSummary />,
+    },
   ]
 
   const progressNum = ProgressObj[progress].progress
@@ -42,52 +80,70 @@ const [progress, setProgress] = useState(0)
   // Use space-between when both buttons exist, center when only one
   const hasNext = progress < ProgressObj.length - 1
   const hasPrevious = progress > 0
-  const spacingCSS = hasNext && hasPrevious 
-    ? { justifyContent: 'space-between' } 
-    : { justifyContent: 'center' }
-    
+  const spacingCSS =
+    hasNext && hasPrevious
+      ? { justifyContent: "space-between" }
+      : { justifyContent: "center" }
+
   return (
     <LayoutBand>
       <Stack>
         <div>
-          <Stack direction='row' sx={{justifyContent: 'space-between', alignItems: 'center'}}>
-            <Heading level="h1" size="h2">Progress</Heading>
+          <Stack
+            direction="row"
+            sx={{ justifyContent: "space-between", alignItems: "center" }}
+          >
+            <Heading level="h1" size="h2">
+              Progress
+            </Heading>
             <span>{progressNum}%</span>
           </Stack>
-           <LinearProgress sx={{height: 10, borderRadius: 5}} variant="determinate" value={progressNum} />
-          <Stack direction='row' sx={{justifyContent: 'space-between', padding: '5px'}}>
-{ProgressObj.map((label) => (
-  <ProgressLabel key={label.number} number={label.number} label={label.label} isMobile={isMobile} filled={label.filled} />
-))}
-
-          </Stack>
-           
-        </div>
-      
-      {/* Render current step component */}
-      {ProgressObj[progress].component}
-
-      <Stack direction="row" sx={spacingCSS}>
-       {progress > 0 && (
-        <Button 
-          variant="outlined" 
-          color="primary"
-          onClick={() => setProgress(progress - 1)}
-        >
-          Previous
-        </Button>
-       )}
-        {progress < ProgressObj.length - 1 && (
-          <Button 
-            variant="contained" 
-            color="primary"
-            onClick={() => setProgress(progress + 1)}
+          <LinearProgress
+            sx={{ height: 10, borderRadius: 5 }}
+            variant="determinate"
+            value={progressNum}
+          />
+          <Stack
+            direction="row"
+            sx={{ justifyContent: "space-between", padding: "5px" }}
           >
-            Next
-          </Button>
-        )}
+            {ProgressObj.map((label) => (
+              <ProgressLabel
+                key={label.number}
+                number={label.number}
+                label={label.label}
+                isMobile={isMobile}
+                filled={label.filled}
+              />
+            ))}
+          </Stack>
+        </div>
+
+        {/* Render current step component */}
+        {ProgressObj[progress].component}
+
+        <Separator size="xs" />
+        <Stack direction="row" sx={spacingCSS}>
+          {progress > 0 && (
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => setProgress(progress - 1)}
+            >
+              Previous
+            </Button>
+          )}
+          {progress < ProgressObj.length - 1 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setProgress(progress + 1)}
+            >
+              Next
+            </Button>
+          )}
+        </Stack>
       </Stack>
-    </Stack>
     </LayoutBand>
   )
 }
