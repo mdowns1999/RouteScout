@@ -6,7 +6,6 @@ import {
   Stack,
   Grid,
   Divider,
-  Container,
   Chip,
   Avatar,
   IconButton,
@@ -18,8 +17,8 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import DeleteIcon from "@mui/icons-material/Delete"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
+import LayoutBand from "../UI/Layoutband/LayoutBand"
 import testImg from "../../assets/images/test.png"
-import Separator from "../UI/Separator/Separator"
 
 // Extract style objects
 const mediaStyles = {
@@ -30,27 +29,17 @@ const mediaStyles = {
 
 export default function TripSummary() {
   return (
-    <>
-      <Container>
-        <Separator />
-        <Heading level="h1" size="h3" centered>
-          Your Trip Summary
-        </Heading>
-        <Paragraph centered>
-          Review your trip route and stops. Hover over map pins for details, or
-          use the sidebar to manage your stops.
-        </Paragraph>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1rem",
-          }}
-        >
-          <Chip label="3 Stops Selected" color="primary" />
-        </div>
-        <Separator />
-      </Container>
+    <LayoutBand>
+      <Heading level="h1" size="h3" centered>
+        Your Trip Summary
+      </Heading>
+      <Paragraph centered>
+        Review your trip route and stops. Hover over map pins for details, or
+        use the sidebar to manage your stops.
+      </Paragraph>
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+        <Chip label="3 Stops Selected" color="primary" />
+      </Box>
 
       <Grid container spacing={2}>
         {/* Left Column - Trip Overview and Route Stops */}
@@ -342,6 +331,6 @@ export default function TripSummary() {
           </Box>
         </Grid>
       </Grid>
-    </>
+    </LayoutBand>
   )
 }

@@ -2,6 +2,12 @@
 import { css } from "@emotion/react"
 
 const spacingMap = {
+  nano: css`
+    height: 0.25rem; /* 2px */
+  `,
+  xxs: css`
+    height: 0.5rem; /* 4px */
+  `,
   xs: css`
     height: 1rem; /* 8px */
   `,
@@ -60,12 +66,22 @@ const lineStyles = css`
   margin: 0;
 `
 
-type SeparatorSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'responsive' | 'section'
+type SeparatorSize =
+  | "nano"
+  | "xxs"
+  | "xs"
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl"
+  | "xxl"
+  | "responsive"
+  | "section";
 
 interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: SeparatorSize
-  showLine?: boolean
-  lineColor?: string
+  size?: SeparatorSize;
+  showLine?: boolean;
+  lineColor?: string;
 }
 
 export default function Separator({

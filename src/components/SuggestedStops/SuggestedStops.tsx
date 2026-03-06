@@ -1,4 +1,3 @@
-import { useState } from "react"
 import {
   CardMedia,
   Card,
@@ -7,15 +6,15 @@ import {
   Stack,
   Grid,
   Divider,
-  Container,
   Chip,
 } from "@mui/material"
 import Checkbox from "@mui/material/Checkbox"
 import RouteIcon from "@mui/icons-material/Route"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
+import LayoutBand from "../UI/Layoutband/LayoutBand"
+import { useTripPlan } from "../../contexts/TripPlanContext"
 import testImg from "../../assets/images/test.png"
-import Separator from "../UI/Separator/Separator"
 
 // Extract style objects
 const mediaStyles = {
@@ -25,30 +24,31 @@ const mediaStyles = {
 }
 
 export default function SuggestedStops() {
-  const [checked, setChecked] = useState(false)
+  const { state, dispatch } = useTripPlan()
+  const selectedStops = state.selectedStops
+
+  const handleStopToggle = (stopId: string) => {
+    const newStops = selectedStops.includes(stopId)
+      ? selectedStops.filter((id) => id !== stopId)
+      : [...selectedStops, stopId]
+    dispatch({ type: "SET_SELECTED_STOPS", payload: newStops })
+  }
 
   return (
-    <>
-      <Container>
-        <Separator />
-        <Heading level="h1" size="h3" centered>
-          Suggested Stops Along Your Route
-        </Heading>
-        <Paragraph centered>
-          Explore stops along your route and select the ones you'd like to
-          visit. Hover over map pins for details.
-        </Paragraph>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1rem",
-          }}
-        >
-          <Chip label="0 Stops Selected" color="primary" />
-        </div>
-        <Separator />
-      </Container>
+    <LayoutBand>
+      <Heading level="h1" size="h3" centered>
+        Suggested Stops Along Your Route
+      </Heading>
+      <Paragraph centered>
+        Explore stops along your route and select the ones you'd like to visit.
+        Hover over map pins for details.
+      </Paragraph>
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+        <Chip
+          label={`${selectedStops.length} Stop${selectedStops.length !== 1 ? "s" : ""} Selected`}
+          color="primary"
+        />
+      </Box>
 
       <Grid container spacing={2}>
         {/* Left Column - Route info and available stops */}
@@ -84,8 +84,8 @@ export default function SuggestedStops() {
                 {/* Individual Stop Card */}
                 <Card sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Checkbox
-                    checked={checked}
-                    onChange={(e) => setChecked(e.target.checked)}
+                    checked={selectedStops.includes("artisan-market")}
+                    onChange={() => handleStopToggle("artisan-market")}
                   />
                   <CardMedia
                     component="img"
@@ -124,6 +124,6 @@ export default function SuggestedStops() {
           </Box>
         </Grid>
       </Grid>
-    </>
+    </LayoutBand>
   )
 }

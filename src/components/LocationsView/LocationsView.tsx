@@ -1,61 +1,92 @@
-import { 
-  Card, 
+import {
+  Card,
   CardContent,
-  Stack, 
-  TextField, 
-  FormControl, 
-  InputLabel, 
-  Select, 
+  Stack,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
   MenuItem,
   Grid,
   Box,
-  IconButton
+  IconButton,
 } from "@mui/material"
-import LocationOnIcon from '@mui/icons-material/LocationOn'
-import SwapVertIcon from '@mui/icons-material/SwapVert'
+import LocationOnIcon from "@mui/icons-material/LocationOn"
+import SwapVertIcon from "@mui/icons-material/SwapVert"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
+import { useTripPlan } from "../../contexts/TripPlanContext"
 
 export default function LocationsView() {
+  const { state, dispatch } = useTripPlan()
+
   return (
-    <LayoutBand spacing="lg">
-      <Heading level='h1' size='h2' centered>
+    <LayoutBand>
+      <Heading level="h1" size="h2" centered>
         Plan your Roadtrip
       </Heading>
       <Paragraph centered>
-        Let's start by setting your starting point and destination. We'll help you discover amazing stops along the way.
+        Let's start by setting your starting point and destination. We'll help
+        you discover amazing stops along the way.
       </Paragraph>
 
       <Grid container spacing={3} sx={{ mt: 2 }}>
         {/* Location Card */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card elevation={2}>
+          <Card elevation={2} sx={{ height: "100%" }}>
             <CardContent>
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{ mb: 2 }}
+              >
                 <LocationOnIcon color="primary" />
-                <Heading level='h2' size='h5'>Route Details</Heading>
+                <Heading level="h2" size="h5">
+                  Route Details
+                </Heading>
               </Stack>
-              
+
               <Stack spacing={2}>
-                <TextField 
+                <TextField
                   fullWidth
-                  label="Starting Point" 
+                  label="Starting Point"
                   variant="outlined"
                   placeholder="Enter your starting location"
+                  value={state.startingPoint}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "SET_STARTING_POINT",
+                      payload: e.target.value,
+                    })
+                  }
+                  required
                 />
-                
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <IconButton size="small" aria-label="swap locations">
+
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                  <IconButton
+                    size="small"
+                    aria-label="swap locations"
+                    onClick={() => dispatch({ type: "SWAP_LOCATIONS" })}
+                  >
                     <SwapVertIcon />
                   </IconButton>
                 </Box>
-                
-                <TextField 
+
+                <TextField
                   fullWidth
-                  label="Destination" 
+                  label="Destination"
                   variant="outlined"
                   placeholder="Enter your destination"
+                  value={state.destination}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "SET_DESTINATION",
+                      payload: e.target.value,
+                    })
+                  }
+                  required
                 />
               </Stack>
             </CardContent>
@@ -64,26 +95,28 @@ export default function LocationsView() {
 
         {/* Preferences Card */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card elevation={2} >
+          <Card elevation={2} sx={{ height: "100%" }}>
             <CardContent>
-              <Heading level='h2' size='h5' sx={{ mb: 2 }}>
+              <Heading level="h2" size="h5" sx={{ mb: 2 }}>
                 Travel Preferences
               </Heading>
-              
+
               <Stack spacing={2}>
                 <FormControl fullWidth>
-                  <InputLabel id="category-label">Category</InputLabel>
+                  <InputLabel id="budget-label">Budget</InputLabel>
                   <Select
-                    labelId="category-label"
-                    id="category-select"
-                    label="Category"
-                    defaultValue=""
+                    labelId="budget-label"
+                    id="budget-select"
+                    label="Budget"
+                    value={state.budget}
+                    onChange={(e) =>
+                      dispatch({ type: "SET_BUDGET", payload: e.target.value })
+                    }
                   >
-                    <MenuItem value="food">Food & Dining</MenuItem>
-                    <MenuItem value="nature">Nature & Parks</MenuItem>
-                    <MenuItem value="history">History & Culture</MenuItem>
-                    <MenuItem value="adventure">Adventure</MenuItem>
-                    <MenuItem value="shopping">Shopping</MenuItem>
+                    <MenuItem value="0-50">$0-$50</MenuItem>
+                    <MenuItem value="50-100">$50-$100</MenuItem>
+                    <MenuItem value="100-200">$100-$200</MenuItem>
+                    <MenuItem value="200+">$200+</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -93,7 +126,13 @@ export default function LocationsView() {
                     labelId="duration-label"
                     id="duration-select"
                     label="Trip Duration"
-                    defaultValue=""
+                    value={state.duration}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "SET_DURATION",
+                        payload: e.target.value,
+                      })
+                    }
                   >
                     <MenuItem value="1">1 Day</MenuItem>
                     <MenuItem value="2-3">2-3 Days</MenuItem>
@@ -108,7 +147,10 @@ export default function LocationsView() {
                     labelId="pace-label"
                     id="pace-select"
                     label="Travel Pace"
-                    defaultValue=""
+                    value={state.pace}
+                    onChange={(e) =>
+                      dispatch({ type: "SET_PACE", payload: e.target.value })
+                    }
                   >
                     <MenuItem value="relaxed">Relaxed</MenuItem>
                     <MenuItem value="moderate">Moderate</MenuItem>

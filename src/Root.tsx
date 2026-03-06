@@ -4,18 +4,19 @@ import { getTheme } from "./theme"
 import { CssBaseline, ThemeProvider } from "@mui/material"
 import { ThemeModeContext } from "./contexts/ThemeModeContext"
 import type { ThemeMode } from "./contexts/ThemeModeContext"
+import { TripPlanProvider } from "./contexts/TripPlanContext"
 
 export default function Root() {
   const getInitialMode = (): ThemeMode => {
     // Check localStorage first
     const savedMode = localStorage.getItem("themeMode")
-    if (savedMode === 'light' || savedMode === 'dark') {
+    if (savedMode === "light" || savedMode === "dark") {
       return savedMode
     }
 
     // Check system preference
     const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
+      "(prefers-color-scheme: dark)",
     ).matches
     return prefersDark ? "dark" : "light"
   }
@@ -36,7 +37,9 @@ export default function Root() {
     <ThemeModeContext.Provider value={{ mode, toggleColorMode }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <App />
+        <TripPlanProvider>
+          <App />
+        </TripPlanProvider>
       </ThemeProvider>
     </ThemeModeContext.Provider>
   )

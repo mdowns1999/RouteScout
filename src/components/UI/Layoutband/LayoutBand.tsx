@@ -10,15 +10,15 @@ const spacingMap = {
   xl: "8rem",
 }
 
-type Spacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type Spacing = "none" | "xs" | "sm" | "md" | "lg" | "xl";
 
-interface LayoutBandProps extends Omit<ContainerProps, 'children'> {
-  spacing?: Spacing
-  children: React.ReactNode
+interface LayoutBandProps extends Omit<ContainerProps, "children"> {
+  spacing?: Spacing;
+  children: React.ReactNode;
 }
 
 export default function LayoutBand({
-  spacing = "md",
+  spacing = "xs",
   children,
   sx = {},
   ...props

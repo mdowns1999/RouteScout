@@ -1,4 +1,5 @@
 import { Button, Chip, LinearProgress, Stack } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 import LayoutBand from "../../components/UI/Layoutband/LayoutBand"
 import Heading from "../../components/UI/Heading/Heading"
 import Paragraph from "../../components/UI/Paragraph/Paragraph"
@@ -9,6 +10,7 @@ import InterestsView from "../../components/InterestsView/InterestsView"
 import SuggestedStops from "../../components/SuggestedStops/SuggestedStops"
 import TripSummary from "../../components/TripSummary/TripSummary"
 import Separator from "../../components/UI/Separator/Separator"
+import { useTripPlan } from "../../contexts/TripPlanContext"
 
 interface ProgressLabelProps {
   number: string;
@@ -42,7 +44,9 @@ const ProgressLabel: React.FC<ProgressLabelProps> = ({
 
 export default function TripPage() {
   const isMobile = useIsMobile()
+  const navigate = useNavigate()
   const [progress, setProgress] = useState(0)
+  const { isStep1Valid, isStep2Valid, isStep3Valid } = useTripPlan()
 
   const ProgressObj = [
     {
@@ -51,6 +55,8 @@ export default function TripPage() {
       filled: true,
       progress: 25,
       component: <LocationsView />,
+      nextBtnLabel: "Continue to Interests",
+      previousBtnLabel: null,
     },
     {
       number: "2",
@@ -58,6 +64,8 @@ export default function TripPage() {
       filled: false,
       progress: 50,
       component: <InterestsView />,
+      nextBtnLabel: "Continue to Suggested Stops",
+      previousBtnLabel: "Back to Locations",
     },
     {
       number: "3",
@@ -65,6 +73,8 @@ export default function TripPage() {
       filled: false,
       progress: 75,
       component: <SuggestedStops />,
+      nextBtnLabel: "Continue to Trip Summary",
+      previousBtnLabel: "Back to Interests",
     },
     {
       number: "4",
@@ -72,18 +82,34 @@ export default function TripPage() {
       filled: false,
       progress: 100,
       component: <TripSummary />,
+      nextBtnLabel: "Export Your Trip",
+      previousBtnLabel: "Back to Suggested Stops",
     },
   ]
 
   const progressNum = ProgressObj[progress].progress
 
-  // Use space-between when both buttons exist, center when only one
-  const hasNext = progress < ProgressObj.length - 1
+  // Validation - determine if current step is valid
+  const isCurrentStepValid = () => {
+    switch (progress) {
+      case 0:
+        return isStep1Valid()
+      case 1:
+        return isStep2Valid()
+      case 2:
+        return isStep3Valid()
+      case 3:
+        return true // Summary page is always valid
+      default:
+        return false
+    }
+  }
+
+  // Use space-between when both buttons exist (back + next/export), center when only one (just next)
   const hasPrevious = progress > 0
-  const spacingCSS =
-    hasNext && hasPrevious
-      ? { justifyContent: "space-between" }
-      : { justifyContent: "center" }
+  const spacingCSS = hasPrevious
+    ? { justifyContent: "space-between" }
+    : { justifyContent: "center" }
 
   return (
     <LayoutBand>
@@ -122,7 +148,7 @@ export default function TripPage() {
         {/* Render current step component */}
         {ProgressObj[progress].component}
 
-        <Separator size="xs" />
+        <Separator size="nano" />
         <Stack direction="row" sx={spacingCSS}>
           {progress > 0 && (
             <Button
@@ -130,16 +156,26 @@ export default function TripPage() {
               color="primary"
               onClick={() => setProgress(progress - 1)}
             >
-              Previous
+              {ProgressObj[progress].previousBtnLabel}
             </Button>
           )}
-          {progress < ProgressObj.length - 1 && (
+          {progress < ProgressObj.length - 1 ? (
             <Button
               variant="contained"
               color="primary"
               onClick={() => setProgress(progress + 1)}
+              disabled={!isCurrentStepValid()}
             >
-              Next
+              {ProgressObj[progress].nextBtnLabel}
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/trip/export")}
+              disabled={!isCurrentStepValid()}
+            >
+              {ProgressObj[progress].nextBtnLabel}
             </Button>
           )}
         </Stack>
