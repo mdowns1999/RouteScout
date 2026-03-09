@@ -1,4 +1,4 @@
-import { Stack, Button, Drawer, Divider } from "@mui/material"
+import { Stack, Drawer } from "@mui/material"
 import type { SxProps, Theme } from "@mui/material"
 import { Link } from "react-router-dom"
 
@@ -7,9 +7,6 @@ import { Link } from "react-router-dom"
 const pages = [
   { name: "Home", id: "home", path: "/" },
   { name: "Plan Trip", id: "trip", path: "/trip" },
-  { name: "My Trips", id: "my-trips", path: "/my-trips" },
-  { name: "Discover", id: "discover", path: "/discover" },
-  { name: "Help", id: "help", path: "/help" },
 ]
 
 interface NavListProps {
@@ -95,24 +92,6 @@ export default function Nav({ drawerOpen = false, onDrawerToggle }: NavProps) {
           },
         }}
       >
-        <Stack px={3} pb={3}>
-          <Button
-            variant="outlined"
-            fullWidth
-            onClick={handleLinkClick}
-            sx={{
-              color: "white",
-              borderColor: "white",
-              "&:hover": {
-                borderColor: "white",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-              },
-            }}
-          >
-            Sign In
-          </Button>
-        </Stack>
-        <Divider sx={{ my: 2, borderColor: "rgba(255, 255, 255, 0.2)" }} />
         <NavList onLinkClick={handleLinkClick} inDrawer />
       </Drawer>
       <NavList

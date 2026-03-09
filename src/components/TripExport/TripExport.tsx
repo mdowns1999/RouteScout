@@ -178,7 +178,8 @@ export default function TripExport() {
             {/* Action Buttons */}
             <Stack spacing={2}>
               <Button
-                variant="outlined"
+                variant="contained"
+                color="secondary"
                 fullWidth
                 size="large"
                 onClick={() => navigate("/trip")}
@@ -186,7 +187,8 @@ export default function TripExport() {
                 Plan New Trip
               </Button>
               <Button
-                variant="text"
+                variant="outlined"
+                color="secondary"
                 fullWidth
                 onClick={() => navigate("/trip")}
               >

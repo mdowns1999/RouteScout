@@ -10,7 +10,7 @@ import MapIcon from "@mui/icons-material/Map"
 
 const getIconCircleCss = (theme: Theme) => css`
   text-align: center;
-  background-color: ${theme.palette.mode === "dark" ? "#ffffff" : "#000000"};
+  background-color: ${theme.palette.accent.vintage};
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -21,7 +21,7 @@ const getIconCircleCss = (theme: Theme) => css`
   margin: 0 auto;
 
   svg {
-    color: ${theme.palette.mode === "dark" ? "#000000" : "#ffffff"};
+    color: #ffffff;
   }
 `
 

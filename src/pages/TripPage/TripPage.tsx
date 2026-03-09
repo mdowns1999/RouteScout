@@ -34,7 +34,7 @@ const ProgressLabel: React.FC<ProgressLabelProps> = ({
       <Chip
         label={number}
         size="small"
-        color="primary"
+        color={filled ? "secondary" : "primary"}
         variant={filled ? "filled" : "outlined"}
       />
       {!isMobile && <Paragraph size="xs">{label}</Paragraph>}
@@ -128,6 +128,7 @@ export default function TripPage() {
             sx={{ height: 10, borderRadius: 5 }}
             variant="determinate"
             value={progressNum}
+            color="secondary"
           />
           <Stack
             direction="row"
@@ -153,7 +154,7 @@ export default function TripPage() {
           {progress > 0 && (
             <Button
               variant="outlined"
-              color="primary"
+              color="secondary"
               onClick={() => setProgress(progress - 1)}
             >
               {ProgressObj[progress].previousBtnLabel}
@@ -162,7 +163,7 @@ export default function TripPage() {
           {progress < ProgressObj.length - 1 ? (
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               onClick={() => setProgress(progress + 1)}
               disabled={!isCurrentStepValid()}
             >
@@ -171,7 +172,7 @@ export default function TripPage() {
           ) : (
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               onClick={() => navigate("/trip/export")}
               disabled={!isCurrentStepValid()}
             >

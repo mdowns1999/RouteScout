@@ -1,18 +1,22 @@
 /* Custom CSS Variables for your app */
 :root {
-  --primaryColor: #2e4057;
-  --secondaryColor: #9cafb7;
-  --accentOne: #2e8b57;
-  --accentTwo: #ffd500;
-  --accentThree: #4281a4;
+  --primaryColor: #2e6f95; /* Ocean Blue */
+  --secondaryColor: #3f7d58; /* Palm Green */
+  --accentOne: #f4b942; /* Golden Sun */
+  --accentTwo: #8b5e3c; /* Vintage Luggage Brown */
+  --accentThree: #d6594d; /* Adventure Red */
+  --backgroundColor: #f6f1e9; /* Passport Cream */
+  --paperColor: #ffffff;
 }
 
 body.dark-mode {
-  --primaryColor: #1a1a2e;
-  --secondaryColor: #2e2e2e;
-  --accentOne: #00b894;
-  --accentTwo: #ffd500;
-  --accentThree: #74b9ff;
+  --primaryColor: #6ba3c6; /* Lightened Ocean Blue */
+  --secondaryColor: #5ca582; /* Lightened Palm Green */
+  --accentOne: #f7cb6d; /* Lightened Golden Sun */
+  --accentTwo: #a67a5a; /* Lightened Vintage Luggage Brown */
+  --accentThree: #e07b72; /* Lightened Adventure Red */
+  --backgroundColor: #1a1a1e; /* Warm dark */
+  --paperColor: #2a2a2e;
 }
 
 /* Layout-specific styles (not covered by CssBaseline) */

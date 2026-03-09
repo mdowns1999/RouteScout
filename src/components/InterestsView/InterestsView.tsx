@@ -114,10 +114,10 @@ export default function InterestsView() {
                 sx={{
                   height: "100%",
                   border: 2,
-                  borderColor: isSelected ? "primary.main" : "transparent",
+                  borderColor: isSelected ? "secondary.main" : "transparent",
                   transition: "all 0.2s",
                   "&:hover": {
-                    borderColor: "primary.light",
+                    borderColor: "secondary.light",
                   },
                 }}
               >
@@ -131,9 +131,9 @@ export default function InterestsView() {
                     >
                       <Box
                         sx={{
-                          bgcolor: isSelected ? "primary.light" : "grey.100",
+                          bgcolor: isSelected ? "secondary.main" : "grey.100",
                           color: isSelected
-                            ? "primary.contrastText"
+                            ? "secondary.contrastText"
                             : "text.primary",
                           p: 1.5,
                           borderRadius: 2,

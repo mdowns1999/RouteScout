@@ -55,6 +55,7 @@ export default function LandingPage() {
           <Button
             variant="contained"
             size="large"
+            color="secondary"
             onClick={() => navigate("/trip")}
           >
             Start Your Trip Now

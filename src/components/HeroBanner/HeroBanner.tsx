@@ -58,6 +58,7 @@ export default function HeroBanner() {
             <Button
               variant="contained"
               size="large"
+              color="secondary"
               onClick={() => navigate("/trip")}
             >
               Start Planning Your Trip
