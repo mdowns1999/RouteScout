@@ -18,6 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
+import Map from "../Map/Map"
 import testImg from "../../assets/images/test.png"
 
 // Extract style objects
@@ -321,13 +322,14 @@ export default function TripSummary() {
         <Grid size={7}>
           <Box
             sx={{
-              height: "100%",
+              height: "600px",
+              width: "100%",
               border: "1px solid #ddd",
               borderRadius: 1,
-              p: 2,
+              overflow: "hidden",
             }}
           >
-            <p>MAP HERE</p>
+            <Map height="600px" />
           </Box>
         </Grid>
       </Grid>

@@ -13,6 +13,7 @@ import RouteIcon from "@mui/icons-material/Route"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
+import Map from "../Map/Map"
 import { useTripPlan } from "../../contexts/TripPlanContext"
 import testImg from "../../assets/images/test.png"
 
@@ -114,13 +115,14 @@ export default function SuggestedStops() {
         <Grid size={7}>
           <Box
             sx={{
-              height: "100%",
+              height: "600px",
+              width: "100%",
               border: "1px solid #ddd",
               borderRadius: 1,
-              p: 2,
+              overflow: "hidden",
             }}
           >
-            <p>MAP HERE</p>
+            <Map height="600px" />
           </Box>
         </Grid>
       </Grid>
