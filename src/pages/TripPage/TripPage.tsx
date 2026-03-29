@@ -1,4 +1,4 @@
-import { Button, Chip, LinearProgress, Stack } from "@mui/material"
+import { Alert, Button, Chip, CircularProgress, LinearProgress, Stack } from "@mui/material"
 import { useNavigate } from "react-router-dom"
 import LayoutBand from "../../components/UI/Layoutband/LayoutBand"
 import Heading from "../../components/UI/Heading/Heading"
@@ -46,7 +46,9 @@ export default function TripPage() {
   const isMobile = useIsMobile()
   const navigate = useNavigate()
   const [progress, setProgress] = useState(0)
-  const { isStep1Valid, isStep2Valid, isStep3Valid } = useTripPlan()
+  const { state, dispatch, isStep1Valid, isStep2Valid, isStep3Valid } = useTripPlan()
+  const [isGeocoding, setIsGeocoding] = useState(false)
+  const [geocodeError, setGeocodeError] = useState<string | null>(null)
 
   const ProgressObj = [
     {
@@ -105,6 +107,42 @@ export default function TripPage() {
     }
   }
 
+  const handleNext = async () => {
+    setGeocodeError(null)
+
+    if (progress === 0) {
+      setIsGeocoding(true)
+      try {
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
+        const encode = encodeURIComponent
+
+        const [startRes, endRes] = await Promise.all([
+          fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encode(state.startLocation)}&key=${apiKey}`).then((r) => r.json()),
+          fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encode(state.endLocation)}&key=${apiKey}`).then((r) => r.json()),
+        ])
+
+        if (startRes.status !== "OK") {
+          setGeocodeError(`Could not find "${state.startLocation}". Please check the address and try again.`)
+          return
+        }
+        if (endRes.status !== "OK") {
+          setGeocodeError(`Could not find "${state.endLocation}". Please check the address and try again.`)
+          return
+        }
+
+        dispatch({ type: "SET_START_LATLNG", payload: startRes.results[0].geometry.location })
+        dispatch({ type: "SET_END_LATLNG", payload: endRes.results[0].geometry.location })
+        setProgress(progress + 1)
+      } catch {
+        setGeocodeError("Failed to look up locations. Please check your connection and try again.")
+      } finally {
+        setIsGeocoding(false)
+      }
+    } else {
+      setProgress(progress + 1)
+    }
+  }
+
   // Use space-between when both buttons exist (back + next/export), center when only one (just next)
   const hasPrevious = progress > 0
   const spacingCSS = hasPrevious
@@ -150,6 +188,11 @@ export default function TripPage() {
         {ProgressObj[progress].component}
 
         <Separator size="nano" />
+        {geocodeError && (
+          <Alert severity="error" sx={{ mb: 1 }} onClose={() => setGeocodeError(null)}>
+            {geocodeError}
+          </Alert>
+        )}
         <Stack direction="row" sx={spacingCSS}>
           {progress > 0 && (
             <Button
@@ -164,10 +207,11 @@ export default function TripPage() {
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => setProgress(progress + 1)}
-              disabled={!isCurrentStepValid()}
+              onClick={handleNext}
+              disabled={!isCurrentStepValid() || isGeocoding}
+              startIcon={isGeocoding ? <CircularProgress size={18} color="inherit" /> : undefined}
             >
-              {ProgressObj[progress].nextBtnLabel}
+              {isGeocoding ? "Looking up locations…" : ProgressObj[progress].nextBtnLabel}
             </Button>
           ) : (
             <Button

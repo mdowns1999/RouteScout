@@ -14,6 +14,7 @@ import {
   Avatar,
 } from "@mui/material"
 import { useNavigate } from "react-router-dom"
+import { useTripPlan } from "../../contexts/TripPlanContext"
 import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import DownloadIcon from "@mui/icons-material/Download"
 import ShareIcon from "@mui/icons-material/Share"
@@ -30,6 +31,7 @@ import Separator from "../UI/Separator/Separator"
 
 export default function TripExport() {
   const navigate = useNavigate()
+  const { state } = useTripPlan()
   const [selectedMap, setSelectedMap] = useState("google")
   const shareableLink = "https://triptrekker.app/trip/8kx980p"
 
@@ -242,12 +244,12 @@ export default function TripExport() {
                   <Paragraph size="sm" sx={{ fontWeight: "bold" }}>
                     From:
                   </Paragraph>
-                  <Paragraph size="sm">d</Paragraph>
+                  <Paragraph size="sm">{state.startLocation}</Paragraph>
 
                   <Paragraph size="sm" sx={{ fontWeight: "bold", mt: 2 }}>
                     To:
                   </Paragraph>
-                  <Paragraph size="sm">s</Paragraph>
+                  <Paragraph size="sm">{state.endLocation}</Paragraph>
                 </Stack>
               </CardContent>
             </Card>

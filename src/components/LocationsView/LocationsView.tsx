@@ -54,7 +54,7 @@ export default function LocationsView() {
                   label="Starting Point"
                   variant="outlined"
                   placeholder="Enter your starting location"
-                  value={state.startingPoint}
+                  value={state.startLocation}
                   onChange={(e) =>
                     dispatch({
                       type: "SET_STARTING_POINT",
@@ -79,7 +79,7 @@ export default function LocationsView() {
                   label="Destination"
                   variant="outlined"
                   placeholder="Enter your destination"
-                  value={state.destination}
+                  value={state.endLocation}
                   onChange={(e) =>
                     dispatch({
                       type: "SET_DESTINATION",
@@ -147,7 +147,7 @@ export default function LocationsView() {
                     labelId="pace-label"
                     id="pace-select"
                     label="Travel Pace"
-                    value={state.pace}
+                    value={state.travelPace}
                     onChange={(e) =>
                       dispatch({ type: "SET_PACE", payload: e.target.value })
                     }
