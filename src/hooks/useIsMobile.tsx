@@ -5,7 +5,7 @@
 
       useEffect(() => {
         const handleResize = () => {
-          setIsMobile(window.innerWidth < 768) // Define your mobile breakpoint
+          setIsMobile(window.innerWidth < 900) // Match MUI md breakpoint
         }
 
         handleResize() // Initial check

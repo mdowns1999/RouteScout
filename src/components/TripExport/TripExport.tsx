@@ -5,328 +5,299 @@ import {
   Stack,
   Grid,
   Button,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  TextField,
-  InputAdornment,
-  IconButton,
   Avatar,
+  Divider,
+  Tooltip,
+  Snackbar,
+  Alert,
+  Chip,
+  Rating,
 } from "@mui/material"
 import { useNavigate } from "react-router-dom"
 import { useTripPlan } from "../../contexts/TripPlanContext"
-import OpenInNewIcon from "@mui/icons-material/OpenInNew"
+import MapIcon from "@mui/icons-material/Map"
 import DownloadIcon from "@mui/icons-material/Download"
-import ShareIcon from "@mui/icons-material/Share"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import PlaceIcon from "@mui/icons-material/Place"
 import RouteIcon from "@mui/icons-material/Route"
 import AccessTimeIcon from "@mui/icons-material/AccessTime"
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
-import testImg from "../../assets/images/test.png"
 import { useState } from "react"
-import Separator from "../UI/Separator/Separator"
 
 export default function TripExport() {
   const navigate = useNavigate()
   const { state } = useTripPlan()
-  const [selectedMap, setSelectedMap] = useState("google")
-  const shareableLink = "https://triptrekker.app/trip/8kx980p"
+  const [snackbarMsg, setSnackbarMsg] = useState("")
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+
+  const showSnackbar = (msg: string) => {
+    setSnackbarMsg(msg)
+    setSnackbarOpen(true)
+  }
+
+  const enc = encodeURIComponent
+
+  const handleOpenGoogleMaps = () => {
+    const waypoints = state.selectedStops
+      .map((s) => `${s.latLng.lat},${s.latLng.lng}`)
+      .join("|")
+    const url =
+      `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${enc(state.startLocation)}` +
+      `&destination=${enc(state.endLocation)}` +
+      (waypoints ? `&waypoints=${enc(waypoints)}` : "") +
+      `&travelmode=driving`
+    window.open(url, "_blank", "noopener,noreferrer")
+  }
+
+  const handleOpenAppleMaps = () => {
+    const url =
+      `https://maps.apple.com/?saddr=${enc(state.startLocation)}` +
+      `&daddr=${enc(state.endLocation)}`
+    window.open(url, "_blank", "noopener,noreferrer")
+  }
+
+  const handleExportGPX = () => {
+    const tripName = `${state.startLocation} to ${state.endLocation}`
+    const waypoints = state.selectedStops
+      .map(
+        (s) =>
+          `    <rtept lat="${s.latLng.lat}" lon="${s.latLng.lng}">\n` +
+          `      <name>${s.name}</name>\n` +
+          `      <desc>${s.address}</desc>\n` +
+          `    </rtept>`
+      )
+      .join("\n")
+    const gpx =
+      `<?xml version="1.0" encoding="UTF-8"?>\n` +
+      `<gpx version="1.1" creator="RouteScout">\n` +
+      `  <metadata><name>${tripName}</name></metadata>\n` +
+      `  <rte>\n` +
+      `    <name>${tripName}</name>\n` +
+      waypoints + "\n" +
+      `  </rte>\n` +
+      `</gpx>`
+    const blob = new Blob([gpx], { type: "application/gpx+xml" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "routescout-trip.gpx"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showSnackbar("GPX file downloaded — open it in your GPS app")
+  }
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareableLink)
-    // Could add a toast notification here
+    const payload = {
+      startLocation: state.startLocation,
+      endLocation: state.endLocation,
+      selectedStops: state.selectedStops,
+    }
+    const shareUrl = `${window.location.origin}/route-scout/trip/share?data=${btoa(JSON.stringify(payload))}`
+    navigator.clipboard.writeText(shareUrl)
+    showSnackbar("Link copied to clipboard!")
   }
 
   return (
     <LayoutBand>
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-        <Box
-          sx={{
-            bgcolor: "secondary.main",
-            borderRadius: "50%",
-            width: 80,
-            height: 80,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <RouteIcon sx={{ fontSize: 50, color: "white" }} />
+      <Box sx={{ maxWidth: 600, mx: "auto" }}>
+
+        {/* Success header */}
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
+          <Box
+            sx={{
+              bgcolor: "secondary.main",
+              borderRadius: "50%",
+              width: 72,
+              height: 72,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 2,
+            }}
+          >
+            <CheckCircleIcon sx={{ fontSize: 42, color: "white" }} />
+          </Box>
+          <Heading level="h1" size="h4" centered>Your Trip is Ready!</Heading>
+          <Paragraph size="sm" centered>
+            Export to your navigation app, download for GPS, or share with friends.
+          </Paragraph>
         </Box>
-      </Box>
-      <Heading level="h1" size="h3" centered>
-        Your Trip is Ready!
-      </Heading>
-      <Paragraph centered>
-        Your road trip has been planned successfully. Export it to your favorite
-        navigation app or share it with friends.
-      </Paragraph>
-      <Separator />
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        {/* Left Column - Export Options */}
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Stack spacing={3}>
-            {/* Export to Maps Card */}
-            <Card>
-              <CardContent>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  alignItems="center"
-                  sx={{ mb: 2 }}
-                >
-                  <OpenInNewIcon color="primary" />
-                  <Heading level="h2" size="h5">
-                    Export to Maps
-                  </Heading>
-                </Stack>
 
-                <RadioGroup
-                  value={selectedMap}
-                  onChange={(e) => setSelectedMap(e.target.value)}
-                >
-                  <FormControlLabel
-                    value="google"
-                    control={<Radio />}
-                    label="Google Maps"
-                  />
-                  <FormControlLabel
-                    value="apple"
-                    control={<Radio />}
-                    label="Apple Maps"
-                  />
-                </RadioGroup>
-              </CardContent>
-            </Card>
-
-            {/* Download Card */}
-            <Card>
-              <CardContent>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  alignItems="center"
-                  sx={{ mb: 2 }}
-                >
-                  <DownloadIcon color="primary" />
-                  <Heading level="h2" size="h5">
-                    Download
-                  </Heading>
-                </Stack>
-
-                <Stack spacing={2}>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<DownloadIcon />}
-                    sx={{ justifyContent: "flex-start" }}
-                  >
-                    Download PDF
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<DownloadIcon />}
-                    sx={{ justifyContent: "flex-start" }}
-                  >
-                    Export Data (JSON)
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-
-            {/* Share Trip Card */}
-            <Card>
-              <CardContent>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  alignItems="center"
-                  sx={{ mb: 2 }}
-                >
-                  <ShareIcon color="primary" />
-                  <Heading level="h2" size="h5">
-                    Share Trip
-                  </Heading>
-                </Stack>
-
-                <Paragraph size="sm" sx={{ mb: 1 }}>
-                  Shareable Link
-                </Paragraph>
-                <TextField
-                  fullWidth
-                  value={shareableLink}
-                  InputProps={{
-                    readOnly: true,
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleCopyLink} edge="end">
-                          <ContentCopyIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <Paragraph size="xs" sx={{ mt: 1, color: "text.secondary" }}>
-                  Share this link with friends and family to let them view your
-                  trip plan.
-                </Paragraph>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <Stack spacing={2}>
-              <Button
-                variant="contained"
-                color="secondary"
-                fullWidth
-                size="large"
-                onClick={() => navigate("/trip")}
-              >
-                Plan New Trip
-              </Button>
-              <Button
-                variant="outlined"
-                color="secondary"
-                fullWidth
-                onClick={() => navigate("/trip")}
-              >
-                Edit This Trip
-              </Button>
+        {/* Stats card */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Stack
+              direction="row"
+              divider={<Divider orientation="vertical" flexItem />}
+              spacing={2}
+              sx={{ justifyContent: "space-around", mb: 2 }}
+            >
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <PlaceIcon sx={{ color: "primary.main", mb: 0.5 }} />
+                <Heading level="h3" size="h5" sx={{ mb: 0 }}>
+                  {state.selectedStops.length}
+                </Heading>
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>Stops</Paragraph>
+              </Box>
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <RouteIcon sx={{ color: "primary.main", mb: 0.5 }} />
+                <Heading level="h3" size="h5" sx={{ mb: 0 }}>
+                  {state.totalDistanceMiles > 0 ? state.totalDistanceMiles : "—"}
+                </Heading>
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>Miles</Paragraph>
+              </Box>
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <AccessTimeIcon sx={{ color: "primary.main", mb: 0.5 }} />
+                <Heading level="h3" size="h5" sx={{ mb: 0 }}>
+                  {state.totalDriveTime || "—"}
+                </Heading>
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>Drive Time</Paragraph>
+              </Box>
             </Stack>
-          </Stack>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, justifyContent: "center" }}>
+              <PlaceIcon sx={{ fontSize: 14, color: "secondary.main", flexShrink: 0 }} />
+              <Paragraph size="sm" sx={{ fontWeight: 600 }}>{state.startLocation}</Paragraph>
+              <Paragraph size="sm" sx={{ color: "text.disabled" }}>→</Paragraph>
+              <Paragraph size="sm" sx={{ fontWeight: 600 }}>{state.endLocation}</Paragraph>
+              <PlaceIcon sx={{ fontSize: 14, color: "error.main", flexShrink: 0 }} />
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Open in Maps */}
+        <Heading level="h2" size="h6" sx={{ mb: 1.5 }}>Open in Maps</Heading>
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              fullWidth
+              startIcon={<MapIcon />}
+              onClick={handleOpenGoogleMaps}
+            >
+              Google Maps
+            </Button>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Tooltip
+              title="Apple Maps doesn't support multiple waypoints — only start and end will be used"
+              placement="top"
+            >
+              <span style={{ display: "block" }}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  fullWidth
+                  startIcon={<MapIcon />}
+                  onClick={handleOpenAppleMaps}
+                >
+                  Apple Maps
+                </Button>
+              </span>
+            </Tooltip>
+          </Grid>
         </Grid>
 
-        {/* Right Column - Trip Summary */}
-        <Grid size={{ xs: 12, md: 8 }}>
-          <Stack spacing={3}>
-            {/* Trip Summary Stats */}
-            <Card>
-              <CardContent>
-                <Heading level="h2" size="h5" sx={{ mb: 3 }}>
-                  Trip Summary
-                </Heading>
+        {/* Secondary actions */}
+        <Heading level="h2" size="h6" sx={{ mb: 1.5 }}>Save & Share</Heading>
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              startIcon={<DownloadIcon />}
+              onClick={handleExportGPX}
+            >
+              Export GPX File
+            </Button>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              startIcon={<ContentCopyIcon />}
+              onClick={handleCopyLink}
+            >
+              Copy Share Link
+            </Button>
+          </Grid>
+        </Grid>
 
-                <Grid container spacing={2}>
-                  <Grid size={4}>
-                    <Box sx={{ textAlign: "center" }}>
-                      <PlaceIcon sx={{ fontSize: 40, mb: 1 }} />
-                      <Heading level="h3" size="h3" sx={{ mb: 0 }}>
-                        1
-                      </Heading>
-                      <Paragraph size="sm">Stops</Paragraph>
-                    </Box>
-                  </Grid>
-                  <Grid size={4}>
-                    <Box sx={{ textAlign: "center" }}>
-                      <RouteIcon sx={{ fontSize: 40, mb: 1 }} />
-                      <Heading level="h3" size="h3" sx={{ mb: 0 }}>
-                        250
-                      </Heading>
-                      <Paragraph size="sm">Miles</Paragraph>
-                    </Box>
-                  </Grid>
-                  <Grid size={4}>
-                    <Box sx={{ textAlign: "center" }}>
-                      <AccessTimeIcon sx={{ fontSize: 40, mb: 1 }} />
-                      <Heading level="h3" size="h3" sx={{ mb: 0 }}>
-                        6h
-                      </Heading>
-                      <Paragraph size="sm">Drive Time</Paragraph>
-                    </Box>
-                  </Grid>
-                </Grid>
-
-                <Stack spacing={1} sx={{ mt: 3 }}>
-                  <Paragraph size="sm" sx={{ fontWeight: "bold" }}>
-                    From:
-                  </Paragraph>
-                  <Paragraph size="sm">{state.startLocation}</Paragraph>
-
-                  <Paragraph size="sm" sx={{ fontWeight: "bold", mt: 2 }}>
-                    To:
-                  </Paragraph>
-                  <Paragraph size="sm">{state.endLocation}</Paragraph>
-                </Stack>
-              </CardContent>
-            </Card>
-
-            {/* Your Stops */}
-            <Card>
-              <CardContent>
-                <Heading level="h2" size="h5" sx={{ mb: 2 }}>
-                  Your Stops
-                </Heading>
-
-                <Stack spacing={2}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Box
-                        sx={{ display: "flex", gap: 2, alignItems: "center" }}
-                      >
-                        <Avatar sx={{ bgcolor: "primary.main" }}>1</Avatar>
+        {/* Stop list */}
+        {state.selectedStops.length > 0 && (
+          <>
+            <Divider sx={{ mb: 3 }} />
+            <Heading level="h2" size="h6" sx={{ mb: 1.5 }}>Your Stops</Heading>
+            <Stack spacing={1.5} sx={{ mb: 3 }}>
+              {state.selectedStops.map((stop, i) => (
+                <Card key={stop.id}>
+                  <CardContent sx={{ py: "12px !important" }}>
+                    <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+                      <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
+                        {i + 1}
+                      </Avatar>
+                      {stop.photoUrl && (
                         <img
-                          src={testImg}
-                          alt="Local Artisan Market"
-                          style={{
-                            width: 64,
-                            height: 64,
-                            objectFit: "cover",
-                            borderRadius: 4,
-                          }}
+                          src={stop.photoUrl}
+                          alt={stop.name}
+                          style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
                         />
-                        <Box sx={{ flex: 1 }}>
-                          <Paragraph
-                            size="sm"
-                            sx={{ fontWeight: "bold", mb: 0.5 }}
-                          >
-                            Local Artisan Market
-                          </Paragraph>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              gap: 0.5,
-                              alignItems: "center",
-                            }}
-                          >
-                            <Paragraph size="xs" sx={{ color: "warning.main" }}>
-                              ⭐ 4.4
-                            </Paragraph>
-                            <Paragraph
-                              size="xs"
-                              sx={{ color: "text.secondary" }}
-                            >
-                              📍 Market Square
-                            </Paragraph>
+                      )}
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
+                          {stop.name}
+                        </Paragraph>
+                        {stop.rating > 0 && (
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.25 }}>
+                            <Rating value={stop.rating} precision={0.1} size="small" readOnly />
+                            <Paragraph size="xs">({stop.totalRatings})</Paragraph>
                           </Box>
-                          <Box sx={{ mt: 0.5 }}>
-                            <Box
-                              component="span"
-                              sx={{
-                                bgcolor: "primary.main",
-                                color: "white",
-                                px: 1,
-                                py: 0.25,
-                                borderRadius: 1,
-                                fontSize: "0.75rem",
-                              }}
-                            >
-                              shopping
-                            </Box>
-                          </Box>
+                        )}
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                          {stop.types.slice(0, 2).map((t) => (
+                            <Chip key={t} label={t.replace(/_/g, " ")} size="small" variant="outlined" />
+                          ))}
                         </Box>
                       </Box>
-                    </CardContent>
-                  </Card>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Stack>
-        </Grid>
-      </Grid>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </>
+        )}
+
+        <Divider sx={{ mb: 3 }} />
+
+        {/* Navigation */}
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ justifyContent: "space-between" }}>
+          <Button variant="outlined" color="secondary" onClick={() => navigate(-1)}>
+            Edit This Trip
+          </Button>
+          <Button variant="contained" color="secondary" size="large" onClick={() => navigate("/trip")}>
+            Plan New Trip
+          </Button>
+        </Stack>
+      </Box>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setSnackbarOpen(false)} sx={{ width: "100%" }}>
+          {snackbarMsg}
+        </Alert>
+      </Snackbar>
     </LayoutBand>
   )
 }

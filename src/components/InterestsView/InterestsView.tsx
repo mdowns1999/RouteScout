@@ -4,7 +4,9 @@ import {
   CardContent,
   Grid,
   Box,
-  Typography,
+  Chip,
+  Container,
+  type SvgIconProps,
 } from "@mui/material"
 import RestaurantIcon from "@mui/icons-material/Restaurant"
 import NatureIcon from "@mui/icons-material/Nature"
@@ -18,70 +20,25 @@ import StarIcon from "@mui/icons-material/Star"
 import PlaceIcon from "@mui/icons-material/Place"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
-import LayoutBand from "../UI/Layoutband/LayoutBand"
 import { useTripPlan } from "../../contexts/TripPlanContext"
+import type { ComponentType } from "react"
 
-const categories = [
-  {
-    id: "food",
-    title: "Food & Dining",
-    description: "Local restaurants, food trucks, breweries",
-    icon: <RestaurantIcon />,
-  },
-  {
-    id: "nature",
-    title: "Nature & Outdoors",
-    description: "Parks, hiking trails, scenic viewpoints",
-    icon: <NatureIcon />,
-  },
-  {
-    id: "history",
-    title: "History & Culture",
-    description: "Museums, historical sites, landmarks",
-    icon: <MuseumIcon />,
-  },
-  {
-    id: "adventure",
-    title: "Adventure Sports",
-    description: "Hiking, climbing, water sports",
-    icon: <TerrainIcon />,
-  },
-  {
-    id: "photography",
-    title: "Photography Spots",
-    description: "Scenic views, Instagram-worthy locations",
-    icon: <CameraAltIcon />,
-  },
-  {
-    id: "arts",
-    title: "Arts & Entertainment",
-    description: "Galleries, theaters, art districts",
-    icon: <PaletteIcon />,
-  },
-  {
-    id: "music",
-    title: "Music & Nightlife",
-    description: "Live music venues, bars, clubs",
-    icon: <MusicNoteIcon />,
-  },
-  {
-    id: "shopping",
-    title: "Shopping",
-    description: "Local markets, unique stores, outlets",
-    icon: <ShoppingBagIcon />,
-  },
-  {
-    id: "attractions",
-    title: "Tourist Attractions",
-    description: "Famous landmarks, theme parks",
-    icon: <StarIcon />,
-  },
-  {
-    id: "hidden",
-    title: "Hidden Gems",
-    description: "Off-the-beaten-path discoveries",
-    icon: <PlaceIcon />,
-  },
+const categories: {
+  id: string
+  title: string
+  description: string
+  Icon: ComponentType<SvgIconProps>
+}[] = [
+  { id: "food",        title: "Food & Dining",        description: "Local restaurants, food trucks, breweries",    Icon: RestaurantIcon },
+  { id: "nature",      title: "Nature & Outdoors",    description: "Parks, hiking trails, scenic viewpoints",      Icon: NatureIcon },
+  { id: "history",     title: "History & Culture",    description: "Museums, historical sites, landmarks",         Icon: MuseumIcon },
+  { id: "adventure",   title: "Adventure Sports",     description: "Hiking, climbing, water sports",               Icon: TerrainIcon },
+  { id: "photography", title: "Photography Spots",    description: "Scenic views, Instagram-worthy locations",     Icon: CameraAltIcon },
+  { id: "arts",        title: "Arts & Entertainment", description: "Galleries, theaters, art districts",           Icon: PaletteIcon },
+  { id: "music",       title: "Music & Nightlife",    description: "Live music venues, bars, clubs",               Icon: MusicNoteIcon },
+  { id: "shopping",    title: "Shopping",             description: "Local markets, unique stores, outlets",        Icon: ShoppingBagIcon },
+  { id: "attractions", title: "Tourist Attractions",  description: "Famous landmarks, theme parks",                Icon: StarIcon },
+  { id: "hidden",      title: "Hidden Gems",          description: "Off-the-beaten-path discoveries",              Icon: PlaceIcon },
 ]
 
 export default function InterestsView() {
@@ -96,16 +53,17 @@ export default function InterestsView() {
   }
 
   return (
-    <LayoutBand spacing="lg">
-      <Heading level="h1" size="h2" centered>
-        What Interests You?
-      </Heading>
-      <Paragraph centered>
-        Select the categories that match your interests. We'll use these to
-        suggest amazing stops along your route.
-      </Paragraph>
+    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 4 }}>
+      <Box sx={{ textAlign: "center", mb: 4 }}>
+        <Heading level="h1" size="h4" centered>
+          What Interests You?
+        </Heading>
+        <Paragraph size="sm" centered>
+          Select the categories that match your interests — we'll suggest stops along your route.
+        </Paragraph>
+      </Box>
 
-      <Grid container spacing={2} sx={{ mt: 2 }}>
+      <Grid container spacing={2}>
         {categories.map((cat) => {
           const isSelected = selected.includes(cat.id)
           return (
@@ -113,47 +71,37 @@ export default function InterestsView() {
               <Card
                 sx={{
                   height: "100%",
-                  border: 2,
-                  borderColor: isSelected ? "secondary.main" : "transparent",
+                  bgcolor: isSelected ? "secondary.main" : "background.paper",
+                  borderColor: isSelected ? "secondary.main" : undefined,
                   transition: "all 0.2s",
                   "&:hover": {
-                    borderColor: "secondary.light",
+                    bgcolor: isSelected ? "secondary.dark" : "action.hover",
                   },
                 }}
               >
-                <CardActionArea
-                  onClick={() => handleSelect(cat.id)}
-                  sx={{ height: "100%" }}
-                >
-                  <CardContent>
-                    <Box
-                      sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}
-                    >
-                      <Box
+                <CardActionArea onClick={() => handleSelect(cat.id)} sx={{ height: "100%" }}>
+                  <CardContent sx={{ textAlign: "center", py: 3 }}>
+                    <Box sx={{ mb: 1.5 }}>
+                      <cat.Icon
                         sx={{
-                          bgcolor: isSelected ? "secondary.main" : "grey.100",
-                          color: isSelected
-                            ? "secondary.contrastText"
-                            : "text.primary",
-                          p: 1.5,
-                          borderRadius: 2,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          minWidth: 56,
-                          minHeight: 56,
-                          transition: "all 0.2s",
+                          fontSize: 40,
+                          color: isSelected ? "secondary.contrastText" : "secondary.main",
                         }}
-                      >
-                        {cat.icon}
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Heading level="h3" size="h6">
-                          {cat.title}
-                        </Heading>
-                        <Paragraph size="xs">{cat.description}</Paragraph>
-                      </Box>
+                      />
                     </Box>
+                    <Heading
+                      level="h3"
+                      size="h6"
+                      sx={{ color: isSelected ? "secondary.contrastText" : "inherit", mb: 0.5 }}
+                    >
+                      {cat.title}
+                    </Heading>
+                    <Paragraph
+                      size="xs"
+                      sx={{ color: isSelected ? "rgba(255,255,255,0.85)" : "text.secondary" }}
+                    >
+                      {cat.description}
+                    </Paragraph>
                   </CardContent>
                 </CardActionArea>
               </Card>
@@ -163,13 +111,13 @@ export default function InterestsView() {
       </Grid>
 
       {selected.length > 0 && (
-        <Box sx={{ mt: 3, textAlign: "center" }}>
-          <Typography variant="body2" color="text.secondary">
-            {selected.length}{" "}
-            {selected.length === 1 ? "category" : "categories"} selected
-          </Typography>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+          <Chip
+            label={`${selected.length} ${selected.length === 1 ? "category" : "categories"} selected`}
+            sx={{ bgcolor: "secondary.main", color: "white", fontWeight: 600 }}
+          />
         </Box>
       )}
-    </LayoutBand>
+    </Container>
   )
 }

@@ -4,32 +4,31 @@ import {
   CardContent,
   Box,
   Stack,
-  Grid,
   Divider,
   Chip,
   Avatar,
   IconButton,
   Rating,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material"
-import RouteIcon from "@mui/icons-material/Route"
 import PlaceIcon from "@mui/icons-material/Place"
 import DeleteIcon from "@mui/icons-material/Delete"
+import ViewListIcon from "@mui/icons-material/ViewList"
+import MapIcon from "@mui/icons-material/Map"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
-import LayoutBand from "../UI/Layoutband/LayoutBand"
 import Map from "../Map/Map"
 import RoutePolyline from "../Map/RoutePolyline"
 import SelectedStopMarkers from "../Map/SelectedStopMarkers"
+import StartEndMarkers from "../Map/StartEndMarkers"
 import { useTripPlan } from "../../contexts/TripPlanContext"
-
-const mediaStyles = {
-  width: 80,
-  height: 80,
-  objectFit: "cover" as const,
-  flexShrink: 0,
-}
+import useIsMobile from "../../hooks/useIsMobile"
+import { useState } from "react"
 
 export default function TripSummary() {
+  const isMobile = useIsMobile()
+  const [mobileView, setMobileView] = useState<"list" | "map">("list")
   const { state, dispatch } = useTripPlan()
   const {
     selectedStops,
@@ -49,147 +48,168 @@ export default function TripSummary() {
   }
 
   return (
-    <LayoutBand>
-      <Heading level="h1" size="h3" centered>
-        Your Trip Summary
-      </Heading>
-      <Paragraph centered>
-        Review your trip route and stops. Hover over map pins for details, or
-        use the sidebar to manage your stops.
-      </Paragraph>
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-        <Chip
-          label={`${selectedStops.length} Stop${selectedStops.length !== 1 ? "s" : ""} Selected`}
-          color="primary"
-        />
-      </Box>
+    <Box>
+      {/* Mobile-only List / Map toggle */}
+      {isMobile && (
+        <Box sx={{ px: 2, py: 1, borderBottom: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+          <ToggleButtonGroup
+            value={mobileView}
+            exclusive
+            onChange={(_, v) => v && setMobileView(v)}
+            fullWidth
+            size="small"
+          >
+            <ToggleButton value="list">
+              <ViewListIcon sx={{ mr: 0.75, fontSize: 18 }} />
+              List
+            </ToggleButton>
+            <ToggleButton value="map">
+              <MapIcon sx={{ mr: 0.75, fontSize: 18 }} />
+              Map
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      )}
 
-      <Grid container spacing={2}>
-        {/* Left Column */}
-        <Grid size={5}>
-          <Stack spacing={2}>
-            {/* Trip Overview Card */}
-            <Card>
-              <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                  <RouteIcon />
-                  <Heading level="h2" size="h4">Trip Overview</Heading>
-                </Stack>
-                <Stack spacing={1}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Paragraph size="sm">Stops:</Paragraph>
-                    <Paragraph size="sm" sx={{ fontWeight: "bold" }}>
-                      {selectedStops.length}
-                    </Paragraph>
-                  </Box>
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Paragraph size="sm">Total Distance:</Paragraph>
-                    <Paragraph size="sm" sx={{ fontWeight: "bold" }}>
-                      {totalDistanceMiles > 0 ? `${totalDistanceMiles} miles` : "—"}
-                    </Paragraph>
-                  </Box>
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Paragraph size="sm">Estimated Drive Time:</Paragraph>
-                    <Paragraph size="sm" sx={{ fontWeight: "bold" }}>
-                      {totalDriveTime || "—"}
-                    </Paragraph>
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
-
-            {/* Route Stops Card */}
-            <Card>
-              <CardContent>
-                <Heading level="h2" size="h5" sx={{ mb: 2 }}>Route Stops</Heading>
-                <Stack spacing={2}>
-                  {/* Start */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <PlaceIcon color="primary" />
-                    <Paragraph size="sm" sx={{ fontWeight: "bold" }}>
-                      Start: {startLocation}
-                    </Paragraph>
-                  </Box>
-
-                  {selectedStops.length === 0 ? (
-                    <Paragraph size="sm">No stops selected.</Paragraph>
-                  ) : (
-                    selectedStops.map((stop, index) => (
-                      <Box key={stop.id}>
-                        <Divider sx={{ mb: 2 }} />
-                        <Card sx={{ display: "flex", alignItems: "flex-start", p: 1.5, gap: 1.5 }}>
-                          <Avatar sx={{ bgcolor: "primary.main", width: 32, height: 32, fontSize: 14 }}>
-                            {index + 1}
-                          </Avatar>
-                          {stop.photoUrl ? (
-                            <CardMedia
-                              component="img"
-                              sx={mediaStyles}
-                              image={stop.photoUrl}
-                              alt={stop.name}
-                            />
-                          ) : (
-                            <Box sx={{ ...mediaStyles, bgcolor: "grey.200" }} />
-                          )}
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Paragraph size="sm" sx={{ fontWeight: "bold", mb: 0.5 }}>
-                              {stop.name}
-                            </Paragraph>
-                            {stop.rating > 0 && (
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
-                                <Rating value={stop.rating} precision={0.1} size="small" readOnly />
-                                <Paragraph size="xs">({stop.totalRatings})</Paragraph>
-                              </Box>
-                            )}
-                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 0.5 }}>
-                              {stop.types.slice(0, 3).map((t) => (
-                                <Chip key={t} label={t.replace(/_/g, " ")} size="small" />
-                              ))}
-                            </Box>
-                            <Paragraph size="xs">
-                              {stop.distanceFromStart} mi • {stop.driveTimeFromStart} from start
-                            </Paragraph>
-                          </Box>
-                          <IconButton
-                            size="small"
-                            aria-label="remove stop"
-                            color="error"
-                            onClick={() => removeStop(stop.id)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Card>
-                      </Box>
-                    ))
-                  )}
-
-                  <Divider />
-
-                  {/* Destination */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <PlaceIcon color="error" />
-                    <Paragraph size="sm" sx={{ fontWeight: "bold" }}>
-                      Destination: {endLocation}
-                    </Paragraph>
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Stack>
-        </Grid>
-
-        {/* Right Column - Map */}
-        <Grid size={7}>
+      {/* Main layout */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          height: { md: "calc(100vh - 240px)" },
+          minHeight: { md: 500 },
+          overflow: { md: "hidden" },
+        }}
+      >
+        {/* Sidebar */}
+        <Box
+          sx={{
+            width: { xs: "100%", md: "35%" },
+            display: !isMobile ? "flex" : mobileView === "list" ? "flex" : "none",
+            flexDirection: "column",
+            borderRight: { md: 1 },
+            borderColor: "divider",
+            overflow: { md: "hidden" },
+          }}
+        >
+          {/* Stats strip */}
           <Box
             sx={{
-              height: "600px",
-              width: "100%",
-              border: "1px solid #ddd",
-              borderRadius: 1,
-              overflow: "hidden",
+              px: 2,
+              py: 1.5,
+              borderBottom: 1,
+              borderColor: "divider",
+              flexShrink: 0,
+              bgcolor: "background.paper",
             }}
           >
-            <Map height="600px">
+            <Stack
+              direction="row"
+              divider={<Divider orientation="vertical" flexItem />}
+              spacing={1}
+              sx={{ justifyContent: "space-around", mb: 1.5 }}
+            >
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <Heading level="h3" size="h5" sx={{ mb: 0 }}>
+                  {selectedStops.length}
+                </Heading>
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>Stops</Paragraph>
+              </Box>
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <Heading level="h3" size="h5" sx={{ mb: 0 }}>
+                  {totalDistanceMiles > 0 ? totalDistanceMiles : "—"}
+                </Heading>
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>Miles</Paragraph>
+              </Box>
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <Heading level="h3" size="h5" sx={{ mb: 0 }}>
+                  {totalDriveTime || "—"}
+                </Heading>
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>Drive Time</Paragraph>
+              </Box>
+            </Stack>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <PlaceIcon sx={{ fontSize: 14, color: "secondary.main", flexShrink: 0 }} />
+              <Paragraph size="xs" sx={{ fontWeight: 600, color: "text.secondary", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {startLocation}
+              </Paragraph>
+              <Paragraph size="xs" sx={{ color: "text.disabled", flexShrink: 0 }}>→</Paragraph>
+              <Paragraph size="xs" sx={{ fontWeight: 600, color: "text.secondary", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {endLocation}
+              </Paragraph>
+              <PlaceIcon sx={{ fontSize: 14, color: "error.main", flexShrink: 0 }} />
+            </Box>
+          </Box>
+
+          {/* Scrollable stop list */}
+          <Box sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
+            {selectedStops.length === 0 ? (
+              <Paragraph size="sm" sx={{ p: 1 }}>
+                No stops selected. Go back to add some!
+              </Paragraph>
+            ) : (
+              <Stack spacing={1.5}>
+                {selectedStops.map((stop, index) => (
+                  <Card key={stop.id} sx={{ display: "flex", alignItems: "flex-start", p: 1.5, gap: 1.5 }}>
+                    <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
+                      {index + 1}
+                    </Avatar>
+                    {stop.photoUrl ? (
+                      <CardMedia
+                        component="img"
+                        sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, flexShrink: 0 }}
+                        image={stop.photoUrl}
+                        alt={stop.name}
+                      />
+                    ) : (
+                      <Box sx={{ width: 80, height: 80, bgcolor: "grey.200", borderRadius: 1, flexShrink: 0 }} />
+                    )}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
+                        {stop.name}
+                      </Paragraph>
+                      {stop.rating > 0 && (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
+                          <Rating value={stop.rating} precision={0.1} size="small" readOnly />
+                          <Paragraph size="xs">({stop.totalRatings})</Paragraph>
+                        </Box>
+                      )}
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 0.5 }}>
+                        {stop.types.slice(0, 2).map((t) => (
+                          <Chip key={t} label={t.replace(/_/g, " ")} size="small" variant="outlined" />
+                        ))}
+                      </Box>
+                      <Paragraph size="xs" sx={{ color: "text.secondary" }}>
+                        {stop.distanceFromStart} mi • {stop.driveTimeFromStart} from start
+                      </Paragraph>
+                    </Box>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      aria-label="remove stop"
+                      onClick={() => removeStop(stop.id)}
+                      sx={{ flexShrink: 0 }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Card>
+                ))}
+              </Stack>
+            )}
+          </Box>
+        </Box>
+
+        {/* Outer clipping wrapper: collapses to 0 when hidden on mobile */}
+        <Box
+          sx={{
+            flex: !isMobile ? 1 : undefined,
+            height: !isMobile ? "100%" : mobileView === "map" ? "calc(100vh - 180px)" : 0,
+            overflow: "hidden",
+          }}
+        >
+          {/* Inner map: always at full size so Google Maps initializes with real dimensions */}
+          <Box sx={{ width: "100%", height: !isMobile ? "100%" : "calc(100vh - 180px)" }}>
+            <Map height="100%">
               {startLatLng && endLatLng && (
                 <RoutePolyline
                   startLatLng={startLatLng}
@@ -197,11 +217,12 @@ export default function TripSummary() {
                   fetchPlaces={false}
                 />
               )}
+              <StartEndMarkers />
               <SelectedStopMarkers />
             </Map>
           </Box>
-        </Grid>
-      </Grid>
-    </LayoutBand>
+        </Box>
+      </Box>
+    </Box>
   )
 }
