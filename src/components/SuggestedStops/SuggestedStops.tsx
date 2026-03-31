@@ -21,6 +21,59 @@ import Paragraph from "../UI/Paragraph/Paragraph"
 import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
 import useIsMobile from "../../hooks/useIsMobile"
 import { useState } from "react"
+import LayoutBand from "../UI/Layoutband/LayoutBand"
+
+function StopCard({
+  stop,
+  isSelected,
+  onToggle,
+}: {
+  stop: Place
+  isSelected: boolean
+  onToggle: (stop: Place) => void
+}) {
+  return (
+    <Card
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        cursor: "pointer",
+        bgcolor: isSelected ? "action.selected" : "background.paper",
+        "&:hover": { bgcolor: isSelected ? "action.selected" : "action.hover" },
+      }}
+      onClick={() => onToggle(stop)}
+    >
+      {stop.photoUrl ? (
+        <CardMedia
+          component="img"
+          sx={{ width: 64, height: 64, objectFit: "cover", flexShrink: 0 }}
+          image={stop.photoUrl}
+          alt={stop.name}
+        />
+      ) : (
+        <Box sx={{ width: 64, height: 64, bgcolor: "grey.200", flexShrink: 0 }} />
+      )}
+      <CardContent sx={{ flex: 1, py: "8px !important", px: 1.5 }}>
+        <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0 }}>
+          {stop.name}
+        </Paragraph>
+        {stop.rating > 0 && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Rating value={stop.rating} precision={0.1} size="small" readOnly />
+            <Paragraph size="xs">({stop.totalRatings})</Paragraph>
+          </Box>
+        )}
+      </CardContent>
+      <Checkbox
+        checked={isSelected}
+        onChange={() => onToggle(stop)}
+        onClick={(e) => e.stopPropagation()}
+        color="secondary"
+        sx={{ mr: 0.5 }}
+      />
+    </Card>
+  )
+}
 
 export default function SuggestedStops() {
   const isMobile = useIsMobile()
@@ -41,7 +94,7 @@ export default function SuggestedStops() {
   const isLoadingStops = startLatLng !== null && availableStops.length === 0
 
   return (
-    <Box>
+    <LayoutBand spacingDirection="all">
       {/* Mobile-only List / Map toggle */}
       {isMobile && (
         <Box sx={{ px: 2, py: 1, borderBottom: 1, borderColor: "divider", bgcolor: "background.paper" }}>
@@ -128,46 +181,12 @@ export default function SuggestedStops() {
                 {availableStops.map((stop) => {
                   const isSelected = selectedStops.some((s) => s.id === stop.id)
                   return (
-                    <Card
+                    <StopCard
                       key={stop.id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        bgcolor: isSelected ? "action.selected" : "background.paper",
-                        "&:hover": { bgcolor: isSelected ? "action.selected" : "action.hover" },
-                      }}
-                      onClick={() => handleStopToggle(stop)}
-                    >
-                      {stop.photoUrl ? (
-                        <CardMedia
-                          component="img"
-                          sx={{ width: 64, height: 64, objectFit: "cover", flexShrink: 0 }}
-                          image={stop.photoUrl}
-                          alt={stop.name}
-                        />
-                      ) : (
-                        <Box sx={{ width: 64, height: 64, bgcolor: "grey.200", flexShrink: 0 }} />
-                      )}
-                      <CardContent sx={{ flex: 1, py: "8px !important", px: 1.5 }}>
-                        <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0 }}>
-                          {stop.name}
-                        </Paragraph>
-                        {stop.rating > 0 && (
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                            <Rating value={stop.rating} precision={0.1} size="small" readOnly />
-                            <Paragraph size="xs">({stop.totalRatings})</Paragraph>
-                          </Box>
-                        )}
-                      </CardContent>
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={() => handleStopToggle(stop)}
-                        onClick={(e) => e.stopPropagation()}
-                        color="secondary"
-                        sx={{ mr: 0.5 }}
-                      />
-                    </Card>
+                      stop={stop}
+                      isSelected={isSelected}
+                      onToggle={handleStopToggle}
+                    />
                   )
                 })}
               </Stack>
@@ -195,6 +214,6 @@ export default function SuggestedStops() {
           </Box>
         </Box>
       </Box>
-    </Box>
+    </LayoutBand>
   )
 }

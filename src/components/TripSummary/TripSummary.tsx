@@ -22,9 +22,66 @@ import Map from "../Map/Map"
 import RoutePolyline from "../Map/RoutePolyline"
 import SelectedStopMarkers from "../Map/SelectedStopMarkers"
 import StartEndMarkers from "../Map/StartEndMarkers"
-import { useTripPlan } from "../../contexts/TripPlanContext"
+import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
 import useIsMobile from "../../hooks/useIsMobile"
 import { useState } from "react"
+import LayoutBand from "../UI/Layoutband/LayoutBand"
+
+function StopCard({
+  stop,
+  index,
+  onRemove,
+}: {
+  stop: Place
+  index: number
+  onRemove: (id: string) => void
+}) {
+  return (
+    <Card sx={{ display: "flex", alignItems: "flex-start", p: 1.5, gap: 1.5 }}>
+      <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
+        {index + 1}
+      </Avatar>
+      {stop.photoUrl ? (
+        <CardMedia
+          component="img"
+          sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, flexShrink: 0 }}
+          image={stop.photoUrl}
+          alt={stop.name}
+        />
+      ) : (
+        <Box sx={{ width: 80, height: 80, bgcolor: "grey.200", borderRadius: 1, flexShrink: 0 }} />
+      )}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
+          {stop.name}
+        </Paragraph>
+        {stop.rating > 0 && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
+            <Rating value={stop.rating} precision={0.1} size="small" readOnly />
+            <Paragraph size="xs">({stop.totalRatings})</Paragraph>
+          </Box>
+        )}
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 0.5 }}>
+          {stop.types.slice(0, 2).map((t) => (
+            <Chip key={t} label={t.replace(/_/g, " ")} size="small" variant="outlined" />
+          ))}
+        </Box>
+        <Paragraph size="xs" sx={{ color: "text.secondary" }}>
+          {stop.distanceFromStart} mi • {stop.driveTimeFromStart} from start
+        </Paragraph>
+      </Box>
+      <IconButton
+        size="small"
+        color="error"
+        aria-label="remove stop"
+        onClick={() => onRemove(stop.id)}
+        sx={{ flexShrink: 0 }}
+      >
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Card>
+  )
+}
 
 export default function TripSummary() {
   const isMobile = useIsMobile()
@@ -48,7 +105,7 @@ export default function TripSummary() {
   }
 
   return (
-    <Box>
+    <LayoutBand>
       {/* Mobile-only List / Map toggle */}
       {isMobile && (
         <Box sx={{ px: 2, py: 1, borderBottom: 1, borderColor: "divider", bgcolor: "background.paper" }}>
@@ -150,49 +207,7 @@ export default function TripSummary() {
             ) : (
               <Stack spacing={1.5}>
                 {selectedStops.map((stop, index) => (
-                  <Card key={stop.id} sx={{ display: "flex", alignItems: "flex-start", p: 1.5, gap: 1.5 }}>
-                    <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
-                      {index + 1}
-                    </Avatar>
-                    {stop.photoUrl ? (
-                      <CardMedia
-                        component="img"
-                        sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, flexShrink: 0 }}
-                        image={stop.photoUrl}
-                        alt={stop.name}
-                      />
-                    ) : (
-                      <Box sx={{ width: 80, height: 80, bgcolor: "grey.200", borderRadius: 1, flexShrink: 0 }} />
-                    )}
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
-                        {stop.name}
-                      </Paragraph>
-                      {stop.rating > 0 && (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
-                          <Rating value={stop.rating} precision={0.1} size="small" readOnly />
-                          <Paragraph size="xs">({stop.totalRatings})</Paragraph>
-                        </Box>
-                      )}
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 0.5 }}>
-                        {stop.types.slice(0, 2).map((t) => (
-                          <Chip key={t} label={t.replace(/_/g, " ")} size="small" variant="outlined" />
-                        ))}
-                      </Box>
-                      <Paragraph size="xs" sx={{ color: "text.secondary" }}>
-                        {stop.distanceFromStart} mi • {stop.driveTimeFromStart} from start
-                      </Paragraph>
-                    </Box>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      aria-label="remove stop"
-                      onClick={() => removeStop(stop.id)}
-                      sx={{ flexShrink: 0 }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Card>
+                  <StopCard key={stop.id} stop={stop} index={index} onRemove={removeStop} />
                 ))}
               </Stack>
             )}
@@ -223,6 +238,6 @@ export default function TripSummary() {
           </Box>
         </Box>
       </Box>
-    </Box>
+    </LayoutBand>
   )
 }

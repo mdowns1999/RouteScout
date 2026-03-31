@@ -14,7 +14,7 @@ import {
   Rating,
 } from "@mui/material"
 import { useNavigate } from "react-router-dom"
-import { useTripPlan } from "../../contexts/TripPlanContext"
+import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
 import MapIcon from "@mui/icons-material/Map"
 import DownloadIcon from "@mui/icons-material/Download"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
@@ -26,6 +26,43 @@ import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
 import { useState } from "react"
+
+function StopCard({ stop, index }: { stop: Place; index: number }) {
+  return (
+    <Card>
+      <CardContent sx={{ py: "12px !important" }}>
+        <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+          <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
+            {index + 1}
+          </Avatar>
+          {stop.photoUrl && (
+            <img
+              src={stop.photoUrl}
+              alt={stop.name}
+              style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
+            />
+          )}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
+              {stop.name}
+            </Paragraph>
+            {stop.rating > 0 && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.25 }}>
+                <Rating value={stop.rating} precision={0.1} size="small" readOnly />
+                <Paragraph size="xs">({stop.totalRatings})</Paragraph>
+              </Box>
+            )}
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+              {stop.types.slice(0, 2).map((t) => (
+                <Chip key={t} label={t.replace(/_/g, " ")} size="small" variant="outlined" />
+              ))}
+            </Box>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  )
+}
 
 export default function TripExport() {
   const navigate = useNavigate()
@@ -105,7 +142,7 @@ export default function TripExport() {
 
   return (
     <LayoutBand>
-      <Box sx={{ maxWidth: 600, mx: "auto" }}>
+      <Box sx={{ maxWidth: 800, mx: "auto" }}>
 
         {/* Success header */}
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
@@ -238,38 +275,7 @@ export default function TripExport() {
             <Heading level="h2" size="h6" sx={{ mb: 1.5 }}>Your Stops</Heading>
             <Stack spacing={1.5} sx={{ mb: 3 }}>
               {state.selectedStops.map((stop, i) => (
-                <Card key={stop.id}>
-                  <CardContent sx={{ py: "12px !important" }}>
-                    <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
-                      <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
-                        {i + 1}
-                      </Avatar>
-                      {stop.photoUrl && (
-                        <img
-                          src={stop.photoUrl}
-                          alt={stop.name}
-                          style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
-                        />
-                      )}
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
-                          {stop.name}
-                        </Paragraph>
-                        {stop.rating > 0 && (
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.25 }}>
-                            <Rating value={stop.rating} precision={0.1} size="small" readOnly />
-                            <Paragraph size="xs">({stop.totalRatings})</Paragraph>
-                          </Box>
-                        )}
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                          {stop.types.slice(0, 2).map((t) => (
-                            <Chip key={t} label={t.replace(/_/g, " ")} size="small" variant="outlined" />
-                          ))}
-                        </Box>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
+                <StopCard key={stop.id} stop={stop} index={i + 1} />
               ))}
             </Stack>
           </>
