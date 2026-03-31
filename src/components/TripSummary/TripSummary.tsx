@@ -1,7 +1,6 @@
 import {
   CardMedia,
   Card,
-  CardContent,
   Box,
   Stack,
   Grid,
@@ -19,6 +18,7 @@ import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
 import Map from "../Map/Map"
+<<<<<<< Updated upstream
 import testImg from "../../assets/images/test.png"
 
 // Extract style objects
@@ -26,11 +26,76 @@ const mediaStyles = {
   maxWidth: 100,
   maxHeight: 200,
   objectFit: "cover" as const, // Prevents image distortion
+=======
+import RoutePolyline from "../Map/RoutePolyline"
+import SelectedStopMarkers from "../Map/SelectedStopMarkers"
+import StartEndMarkers from "../Map/StartEndMarkers"
+import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
+import useIsMobile from "../../hooks/useIsMobile"
+import { useState } from "react"
+import LayoutBand from "../UI/Layoutband/LayoutBand"
+
+function StopCard({
+  stop,
+  index,
+  onRemove,
+}: {
+  stop: Place
+  index: number
+  onRemove: (id: string) => void
+}) {
+  return (
+    <Card sx={{ display: "flex", alignItems: "flex-start", p: 1.5, gap: 1.5 }}>
+      <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
+        {index + 1}
+      </Avatar>
+      {stop.photoUrl ? (
+        <CardMedia
+          component="img"
+          sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, flexShrink: 0 }}
+          image={stop.photoUrl}
+          alt={stop.name}
+        />
+      ) : (
+        <Box sx={{ width: 80, height: 80, bgcolor: "grey.200", borderRadius: 1, flexShrink: 0 }} />
+      )}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
+          {stop.name}
+        </Paragraph>
+        {stop.rating > 0 && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
+            <Rating value={stop.rating} precision={0.1} size="small" readOnly />
+            <Paragraph size="xs">({stop.totalRatings})</Paragraph>
+          </Box>
+        )}
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 0.5 }}>
+          {stop.types.slice(0, 2).map((t) => (
+            <Chip key={t} label={t.replace(/_/g, " ")} size="small" variant="outlined" />
+          ))}
+        </Box>
+        <Paragraph size="xs" sx={{ color: "text.secondary" }}>
+          {stop.distanceFromStart} mi • {stop.driveTimeFromStart} from start
+        </Paragraph>
+      </Box>
+      <IconButton
+        size="small"
+        color="error"
+        aria-label="remove stop"
+        onClick={() => onRemove(stop.id)}
+        sx={{ flexShrink: 0 }}
+      >
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Card>
+  )
+>>>>>>> Stashed changes
 }
 
 export default function TripSummary() {
   return (
     <LayoutBand>
+<<<<<<< Updated upstream
       <Heading level="h1" size="h3" centered>
         Your Trip Summary
       </Heading>
@@ -41,6 +106,29 @@ export default function TripSummary() {
       <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
         <Chip label="3 Stops Selected" color="primary" />
       </Box>
+=======
+      {/* Mobile-only List / Map toggle */}
+      {isMobile && (
+        <Box sx={{ px: 2, py: 1, borderBottom: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+          <ToggleButtonGroup
+            value={mobileView}
+            exclusive
+            onChange={(_, v) => v && setMobileView(v)}
+            fullWidth
+            size="small"
+          >
+            <ToggleButton value="list">
+              <ViewListIcon sx={{ mr: 0.75, fontSize: 18 }} />
+              List
+            </ToggleButton>
+            <ToggleButton value="map">
+              <MapIcon sx={{ mr: 0.75, fontSize: 18 }} />
+              Map
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      )}
+>>>>>>> Stashed changes
 
       <Grid container spacing={2}>
         {/* Left Column - Trip Overview and Route Stops */}
@@ -89,6 +177,7 @@ export default function TripSummary() {
               </CardContent>
             </Card>
 
+<<<<<<< Updated upstream
             {/* Route Stops Card */}
             <Card>
               <CardContent>
@@ -107,6 +196,23 @@ export default function TripSummary() {
                       </Paragraph>
                     </Box>
                   </Box>
+=======
+          {/* Scrollable stop list */}
+          <Box sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
+            {selectedStops.length === 0 ? (
+              <Paragraph size="sm" sx={{ p: 1 }}>
+                No stops selected. Go back to add some!
+              </Paragraph>
+            ) : (
+              <Stack spacing={1.5}>
+                {selectedStops.map((stop, index) => (
+                  <StopCard key={stop.id} stop={stop} index={index} onRemove={removeStop} />
+                ))}
+              </Stack>
+            )}
+          </Box>
+        </Box>
+>>>>>>> Stashed changes
 
                   <Divider />
 
@@ -331,8 +437,13 @@ export default function TripSummary() {
           >
             <Map height="600px" />
           </Box>
+<<<<<<< Updated upstream
         </Grid>
       </Grid>
+=======
+        </Box>
+      </Box>
+>>>>>>> Stashed changes
     </LayoutBand>
   )
 }

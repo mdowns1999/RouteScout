@@ -40,6 +40,7 @@ export default function TripExport() {
 
   return (
     <LayoutBand>
+<<<<<<< Updated upstream
       <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
         <Box
           sx={{
@@ -53,6 +54,30 @@ export default function TripExport() {
           }}
         >
           <RouteIcon sx={{ fontSize: 50, color: "white" }} />
+=======
+      <Box sx={{ maxWidth: 800, mx: "auto" }}>
+
+        {/* Success header */}
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
+          <Box
+            sx={{
+              bgcolor: "secondary.main",
+              borderRadius: "50%",
+              width: 72,
+              height: 72,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 2,
+            }}
+          >
+            <CheckCircleIcon sx={{ fontSize: 42, color: "white" }} />
+          </Box>
+          <Heading level="h1" size="h4" centered>Your Trip is Ready!</Heading>
+          <Paragraph size="sm" centered>
+            Export to your navigation app, download for GPS, or share with friends.
+          </Paragraph>
+>>>>>>> Stashed changes
         </Box>
       </Box>
       <Heading level="h1" size="h3" centered>
