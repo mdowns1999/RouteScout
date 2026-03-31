@@ -3,26 +3,20 @@ import {
   CardContent,
   Box,
   Stack,
-  Grid,
-  Divider,
   Chip,
+  CircularProgress,
+  Rating,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material"
 import Checkbox from "@mui/material/Checkbox"
-import RouteIcon from "@mui/icons-material/Route"
-import Heading from "../UI/Heading/Heading"
-import Paragraph from "../UI/Paragraph/Paragraph"
-<<<<<<< Updated upstream
-import LayoutBand from "../UI/Layoutband/LayoutBand"
+import ViewListIcon from "@mui/icons-material/ViewList"
+import MapIcon from "@mui/icons-material/Map"
 import Map from "../Map/Map"
-import { useTripPlan } from "../../contexts/TripPlanContext"
-import testImg from "../../assets/images/test.png"
-
-// Extract style objects
-const mediaStyles = {
-  maxWidth: 100,
-  maxHeight: 200,
-  objectFit: "cover" as const, // Prevents image distortion
-=======
+import RoutePolyline from "../Map/RoutePolyline"
+import StopMarkers from "../Map/StopMarkers"
+import StartEndMarkers from "../Map/StartEndMarkers"
+import Paragraph from "../UI/Paragraph/Paragraph"
 import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
 import useIsMobile from "../../hooks/useIsMobile"
 import { useState } from "react"
@@ -68,37 +62,27 @@ function StopCard({
       />
     </Card>
   )
->>>>>>> Stashed changes
 }
 
 export default function SuggestedStops() {
+  const isMobile = useIsMobile()
+  const [mobileView, setMobileView] = useState<"list" | "map">("list")
   const { state, dispatch } = useTripPlan()
-  const selectedStops = state.selectedStops
+  const { selectedStops, availableStops, startLatLng, endLatLng, startLocation, endLocation } = state
 
-  const handleStopToggle = (stopId: string) => {
-    const newStops = selectedStops.includes(stopId)
-      ? selectedStops.filter((id) => id !== stopId)
-      : [...selectedStops, stopId]
-    dispatch({ type: "SET_SELECTED_STOPS", payload: newStops })
+  const handleStopToggle = (stop: Place) => {
+    const isSelected = selectedStops.some((s) => s.id === stop.id)
+    dispatch({
+      type: "SET_SELECTED_STOPS",
+      payload: isSelected
+        ? selectedStops.filter((s) => s.id !== stop.id)
+        : [...selectedStops, stop],
+    })
   }
 
+  const isLoadingStops = startLatLng !== null && availableStops.length === 0
+
   return (
-<<<<<<< Updated upstream
-    <LayoutBand>
-      <Heading level="h1" size="h3" centered>
-        Suggested Stops Along Your Route
-      </Heading>
-      <Paragraph centered>
-        Explore stops along your route and select the ones you'd like to visit.
-        Hover over map pins for details.
-      </Paragraph>
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-        <Chip
-          label={`${selectedStops.length} Stop${selectedStops.length !== 1 ? "s" : ""} Selected`}
-          color="primary"
-        />
-      </Box>
-=======
     <LayoutBand spacingDirection="all">
       {/* Mobile-only List / Map toggle */}
       {isMobile && (
@@ -121,85 +105,55 @@ export default function SuggestedStops() {
           </ToggleButtonGroup>
         </Box>
       )}
->>>>>>> Stashed changes
 
-      <Grid container spacing={2}>
-        {/* Left Column - Route info and available stops */}
-        <Grid size={5}>
-          <Stack spacing={2}>
-            {/* Your Route Card */}
-            <Card>
-              <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <RouteIcon />
-                  <Heading level="h1" size="h4">
-                    Your Route
-                  </Heading>
-                </Stack>
-                <div>
-                  <Paragraph size="sm">To:</Paragraph>
-                  <Paragraph size="sm">From:</Paragraph>
-                  <Divider />
-                  <Paragraph size="sm">
-                    2 Stops available along your route
-                  </Paragraph>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Available Stops Card */}
-            <Card>
-              <CardContent>
-                <Heading level="h2" size="h5" sx={{ mb: 2 }}>
-                  Available Stops
-                </Heading>
-
-                {/* Individual Stop Card */}
-                <Card sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Checkbox
-                    checked={selectedStops.includes("artisan-market")}
-                    onChange={() => handleStopToggle("artisan-market")}
-                  />
-                  <CardMedia
-                    component="img"
-                    sx={mediaStyles}
-                    image={testImg}
-                    alt="Local Artisan Market"
-                  />
-                  <CardContent sx={{ flex: 1 }}>
-                    <Heading level="h3" size="h6">
-                      Local Artisan Market
-                    </Heading>
-                    <Paragraph size="sm">
-                      Weekly market featuring local crafts, food, and live
-                      music.
-                    </Paragraph>
-                  </CardContent>
-                </Card>
-
-                {/* You can add more stop cards here */}
-              </CardContent>
-            </Card>
-          </Stack>
-        </Grid>
-
-        {/* Right Column - Map */}
-        <Grid size={7}>
+      {/* Main layout */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          height: { md: "calc(100vh - 240px)" },
+          minHeight: { md: 500 },
+          overflow: { md: "hidden" },
+        }}
+      >
+        {/* Sidebar */}
+        <Box
+          sx={{
+            width: { xs: "100%", md: "35%" },
+            display: !isMobile ? "flex" : mobileView === "list" ? "flex" : "none",
+            flexDirection: "column",
+            borderRight: { md: 1 },
+            borderColor: "divider",
+            overflow: { md: "hidden" },
+          }}
+        >
+          {/* Sidebar header */}
           <Box
             sx={{
-              height: "600px",
-              width: "100%",
-              border: "1px solid #ddd",
-              borderRadius: 1,
-              overflow: "hidden",
+              px: 2,
+              py: 1.5,
+              borderBottom: 1,
+              borderColor: "divider",
+              flexShrink: 0,
+              bgcolor: "background.paper",
             }}
           >
-            <Map height="600px" />
+            <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.5 }}>
+              {startLocation} → {endLocation}
+            </Paragraph>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Chip
+                label={`${selectedStops.length} stop${selectedStops.length !== 1 ? "s" : ""} selected`}
+                size="small"
+                color="secondary"
+              />
+              {!isLoadingStops && availableStops.length > 0 && (
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>
+                  of {availableStops.length} available
+                </Paragraph>
+              )}
+            </Box>
           </Box>
-<<<<<<< Updated upstream
-        </Grid>
-      </Grid>
-=======
 
           {/* Scrollable stop list */}
           <Box sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
@@ -249,7 +203,6 @@ export default function SuggestedStops() {
           </Box>
         </Box>
       </Box>
->>>>>>> Stashed changes
     </LayoutBand>
   )
 }

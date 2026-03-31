@@ -58,14 +58,36 @@ export const getTheme = (mode: ThemeMode) =>
       },
     },
     typography: {
-      fontSize: 16,
-      fontFamily: '"Montserrat", sans-serif',
-      h1: { fontFamily: '"Source Sans 3", sans-serif' },
-      h2: { fontFamily: '"Source Sans 3", sans-serif' },
-      h3: { fontFamily: '"Source Sans 3", sans-serif' },
-      h4: { fontFamily: '"Source Sans 3", sans-serif' },
-      h5: { fontFamily: '"Source Sans 3", sans-serif' },
-      h6: { fontFamily: '"Source Sans 3", sans-serif' },
+      fontFamily: '"DM Sans", sans-serif',
+      fontSize:16,
+      fontWeightBold: 700,
+      h4: { fontWeight: 700 },
+      h5: { fontWeight: 700 },
+      h6: { fontWeight: 600 },
+    },
+    shape: { borderRadius: 10 },
+    components: {
+      MuiCard: {
+        defaultProps: { elevation: 0 },
+        styleOverrides: {
+          root: ({ theme }: { theme: import("@mui/material").Theme }) => ({
+            border: `1px solid ${theme.palette.mode === "light" ? "#e0ddd6" : "#3a3a3e"}`,
+          }),
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: { borderRadius: 8, textTransform: "none" as const, fontWeight: 600 },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: ({ theme }: { theme: import("@mui/material").Theme }) => ({
+            borderRadius: 8,
+            backgroundColor: theme.palette.background.paper,
+          }),
+        },
+      },
     },
   })
 
