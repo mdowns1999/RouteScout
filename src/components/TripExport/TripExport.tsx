@@ -76,6 +76,47 @@ export default function TripExport() {
   }
 
   const enc = encodeURIComponent
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+        <Box
+          sx={{
+            bgcolor: "secondary.main",
+            borderRadius: "50%",
+            width: 80,
+            height: 80,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <RouteIcon sx={{ fontSize: 50, color: "white" }} />
+        </Box>
+      </Box>
+      <Heading level="h1" size="h3" centered>
+        Your Trip is Ready!
+      </Heading>
+      <Paragraph centered>
+        Your road trip has been planned successfully. Export it to your favorite
+        navigation app or share it with friends.
+      </Paragraph>
+      <Separator />
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        {/* Left Column - Export Options */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Stack spacing={3}>
+            {/* Export to Maps Card */}
+            <Card>
+              <CardContent>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{ mb: 2 }}
+                >
+                  <OpenInNewIcon color="primary" />
+                  <Heading level="h2" size="h5">
+                    Export to Maps
+                  </Heading>
+                </Stack>
 
   const handleOpenGoogleMaps = () => {
     const waypoints = state.selectedStops
