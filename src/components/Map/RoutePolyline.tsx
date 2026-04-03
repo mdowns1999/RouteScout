@@ -1,26 +1,13 @@
 import { useEffect } from "react"
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps"
 import { useTripPlan, type LatLng, type Place } from "../../contexts/TripPlanContext"
+import { INTEREST_TYPE_MAP } from "../../constants/categories"
 
 interface RoutePolylineProps {
   startLatLng: LatLng
   endLatLng: LatLng
+  waypoints?: LatLng[]
   fetchPlaces?: boolean
-}
-
-// --- Constants ---
-
-const INTEREST_TYPE_MAP: Record<string, string[]> = {
-  food:        ["restaurant", "cafe", "bakery", "bar"],
-  nature:      ["park", "campground", "national_park", "hiking_area"],
-  history:     ["museum", "historical_landmark", "art_gallery"],
-  adventure:   ["sports_complex", "rock_climbing_gym"],
-  photography: ["scenic_point", "viewpoint"],
-  arts:        ["art_gallery", "performing_arts_theater"],
-  music:       ["night_club", "bar"],
-  shopping:    ["shopping_mall", "market", "store"],
-  attractions: ["tourist_attraction", "amusement_park"],
-  hidden:      ["point_of_interest"],
 }
 
 // --- Helper types ---
@@ -35,6 +22,43 @@ interface ApiPlace {
   photos?: { name: string }[]
   types?: string[]
   primaryType?: string
+  nationalPhoneNumber?: string
+  editorialSummary?: { text: string }
+  googleMapsUri?: string
+}
+
+// --- Module-level caches (survive re-renders and step navigation; reset on page refresh) ---
+
+interface RouteCacheEntry {
+  path: LatLng[]
+  totalMeters: number
+  totalSeconds: number
+}
+
+const routeCache = new Map<string, RouteCacheEntry>()
+const placesCache = new Map<string, ApiPlace[]>()
+
+function routeCacheKey(start: LatLng, end: LatLng, waypoints?: LatLng[]): string {
+  const wps = waypoints && waypoints.length > 0
+    ? "|" + waypoints.map((wp) => `${wp.lat.toFixed(5)},${wp.lng.toFixed(5)}`).join(";")
+    : ""
+  return `${start.lat.toFixed(5)},${start.lng.toFixed(5)}→${end.lat.toFixed(5)},${end.lng.toFixed(5)}${wps}`
+}
+
+function placesCacheKey(
+  midpoint: LatLng,
+  types: string[],
+  radiusMeters: number,
+  priceLevels: string[],
+  rankPreference: string
+): string {
+  return [
+    `${midpoint.lat.toFixed(4)},${midpoint.lng.toFixed(4)}`,
+    [...types].sort().join(","),
+    Math.round(radiusMeters),
+    priceLevels.join(","),
+    rankPreference,
+  ].join("|")
 }
 
 // --- Pure helper functions ---
@@ -100,11 +124,40 @@ function formatDriveTime(hours: number): string {
   return `${h}h ${m}m`
 }
 
+function getBudgetPriceLevels(budget: string): string[] {
+  switch (budget) {
+    case "0-50":    return ["PRICE_LEVEL_FREE", "PRICE_LEVEL_INEXPENSIVE"]
+    case "50-100":  return ["PRICE_LEVEL_FREE", "PRICE_LEVEL_INEXPENSIVE", "PRICE_LEVEL_MODERATE"]
+    case "100-200": return ["PRICE_LEVEL_FREE", "PRICE_LEVEL_INEXPENSIVE", "PRICE_LEVEL_MODERATE", "PRICE_LEVEL_EXPENSIVE"]
+    default:        return [] // "200+" — no filter, show all
+  }
+}
+
 async function fetchPlacesAtPoint(
   midpoint: LatLng,
   types: string[],
-  apiKey: string
+  apiKey: string,
+  radiusMeters: number,
+  priceLevels: string[],
+  rankPreference: string
 ): Promise<ApiPlace[]> {
+  const key = placesCacheKey(midpoint, types, radiusMeters, priceLevels, rankPreference)
+  if (placesCache.has(key)) return placesCache.get(key)!
+
+  const body: Record<string, unknown> = {
+    locationRestriction: {
+      circle: {
+        center: { latitude: midpoint.lat, longitude: midpoint.lng },
+        radius: radiusMeters,
+      },
+    },
+    includedTypes: types,
+    maxResultCount: 20,
+    rankPreference,
+  }
+  if (priceLevels.length > 0) {
+    body.priceLevels = priceLevels
+  }
   const res = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
     method: "POST",
     headers: {
@@ -112,22 +165,16 @@ async function fetchPlacesAtPoint(
       "X-Goog-Api-Key": apiKey,
       "X-Goog-FieldMask":
         "places.id,places.displayName,places.formattedAddress,places.location," +
-        "places.rating,places.userRatingCount,places.photos,places.types,places.primaryType",
+        "places.rating,places.userRatingCount,places.photos,places.types,places.primaryType," +
+        "places.nationalPhoneNumber,places.editorialSummary,places.googleMapsUri",
     },
-    body: JSON.stringify({
-      locationRestriction: {
-        circle: {
-          center: { latitude: midpoint.lat, longitude: midpoint.lng },
-          radius: 40233.6, // 25 miles in meters
-        },
-      },
-      includedTypes: types,
-      maxResultCount: 10,
-    }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) return []
   const data = await res.json() as { places?: ApiPlace[] }
-  return data.places ?? []
+  const places = data.places ?? []
+  placesCache.set(key, places)
+  return places
 }
 
 function toPlace(raw: ApiPlace, startLatLng: LatLng, apiKey: string): Place {
@@ -147,12 +194,15 @@ function toPlace(raw: ApiPlace, startLatLng: LatLng, apiKey: string): Place {
     types: raw.types ?? [],
     distanceFromStart: Math.round(distMiles * 10) / 10,
     driveTimeFromStart: formatDriveTime(distMiles / 55),
+    phone: raw.nationalPhoneNumber ?? null,
+    description: raw.editorialSummary?.text ?? null,
+    mapsUrl: raw.googleMapsUri ?? null,
   }
 }
 
 // --- Component ---
 
-export default function RoutePolyline({ startLatLng, endLatLng, fetchPlaces = true }: RoutePolylineProps) {
+export default function RoutePolyline({ startLatLng, endLatLng, waypoints, fetchPlaces = true }: RoutePolylineProps) {
   const map = useMap()
   const mapsLib = useMapsLibrary("maps")
   const coreLib = useMapsLibrary("core")
@@ -167,44 +217,57 @@ export default function RoutePolyline({ startLatLng, endLatLng, fetchPlaces = tr
     const run = async () => {
       const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 
-      // --- Fetch route polyline ---
-      const res = await fetch(
-        "https://routes.googleapis.com/directions/v2:computeRoutes",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": apiKey,
-            "X-Goog-FieldMask": "routes.polyline,routes.legs",
-          },
-          body: JSON.stringify({
-            origin: { location: { latLng: { latitude: startLatLng.lat, longitude: startLatLng.lng } } },
-            destination: { location: { latLng: { latitude: endLatLng.lat, longitude: endLatLng.lng } } },
-            travelMode: "DRIVE",
-            polylineQuality: "HIGH_QUALITY",
-          }),
+      // --- Fetch route polyline (cached) ---
+      const cacheKey = routeCacheKey(startLatLng, endLatLng, waypoints)
+      let routeEntry = routeCache.get(cacheKey)
+
+      if (!routeEntry) {
+        const res = await fetch(
+          "https://routes.googleapis.com/directions/v2:computeRoutes",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Goog-Api-Key": apiKey,
+              "X-Goog-FieldMask": "routes.polyline,routes.legs",
+            },
+            body: JSON.stringify({
+              origin: { location: { latLng: { latitude: startLatLng.lat, longitude: startLatLng.lng } } },
+              destination: { location: { latLng: { latitude: endLatLng.lat, longitude: endLatLng.lng } } },
+              ...(waypoints && waypoints.length > 0 && {
+                intermediates: waypoints.map((wp) => ({
+                  location: { latLng: { latitude: wp.lat, longitude: wp.lng } },
+                })),
+              }),
+              travelMode: "DRIVE",
+              polylineQuality: "HIGH_QUALITY",
+            }),
+          }
+        )
+
+        if (!res.ok || cancelled) return
+
+        const data = await res.json() as {
+          routes?: {
+            polyline: { encodedPolyline: string }
+            legs?: { distanceMeters?: number; duration?: string }[]
+          }[]
         }
-      )
+        if (cancelled || !data.routes?.[0]?.polyline?.encodedPolyline) return
 
-      if (!res.ok || cancelled) return
+        const route = data.routes[0]
+        const totalMeters = route.legs?.reduce((sum, leg) => sum + (leg.distanceMeters ?? 0), 0) ?? 0
+        const totalSeconds = route.legs?.reduce((sum, leg) => {
+          return sum + parseInt((leg.duration ?? "0s").replace("s", ""), 10)
+        }, 0) ?? 0
 
-      const data = await res.json() as {
-        routes?: {
-          polyline: { encodedPolyline: string }
-          legs?: { distanceMeters?: number; duration?: string }[]
-        }[]
+        routeEntry = { path: decodePolyline(route.polyline.encodedPolyline), totalMeters, totalSeconds }
+        routeCache.set(cacheKey, routeEntry)
       }
-      if (cancelled || !data.routes?.[0]?.polyline?.encodedPolyline) return
 
-      const route = data.routes[0]
-      const path = decodePolyline(route.polyline.encodedPolyline)
       if (cancelled) return
 
-      // Dispatch route stats (distance + drive time from API)
-      const totalMeters = route.legs?.reduce((sum, leg) => sum + (leg.distanceMeters ?? 0), 0) ?? 0
-      const totalSeconds = route.legs?.reduce((sum, leg) => {
-        return sum + parseInt((leg.duration ?? "0s").replace("s", ""), 10)
-      }, 0) ?? 0
+      const { path, totalMeters, totalSeconds } = routeEntry
       if (totalMeters > 0) {
         dispatch({
           type: "SET_ROUTE_STATS",
@@ -230,14 +293,19 @@ export default function RoutePolyline({ startLatLng, endLatLng, fetchPlaces = tr
 
       // --- Fetch places along route ---
       if (!fetchPlaces || cancelled) return
-      const types = [...new Set(
-        state.selectedInterests.flatMap((id) => INTEREST_TYPE_MAP[id] ?? [])
-      )]
-      if (types.length === 0) return
+      if (state.selectedInterests.length === 0) return
 
+      const radiusMeters = parseFloat(state.searchRadius ?? "25") * 1609.34
+      const priceLevels = getBudgetPriceLevels(state.budget)
+      const rankPreference = state.rankPreference ?? "POPULARITY"
       const midpoints = sampleMidpoints(path, 50)
+
+      // One call per category × per midpoint — ensures every selected category gets results
       const allRaw = await Promise.all(
-        midpoints.map((mp) => fetchPlacesAtPoint(mp, types, apiKey))
+        state.selectedInterests.flatMap((catId) => {
+          const types = INTEREST_TYPE_MAP[catId] ?? []
+          return midpoints.map((mp) => fetchPlacesAtPoint(mp, types, apiKey, radiusMeters, priceLevels, rankPreference))
+        })
       )
       if (cancelled) return
 
@@ -255,7 +323,7 @@ export default function RoutePolyline({ startLatLng, endLatLng, fetchPlaces = tr
       cancelled = true
       polyline?.setMap(null)
     }
-  }, [map, mapsLib, coreLib, startLatLng, endLatLng, state.selectedInterests, dispatch])
+  }, [map, mapsLib, coreLib, startLatLng, endLatLng, waypoints, state.selectedInterests, state.budget, state.searchRadius, state.rankPreference, dispatch])
 
   return null
 }

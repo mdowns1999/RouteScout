@@ -13,8 +13,10 @@ import {
 } from "@mui/material"
 import PlaceIcon from "@mui/icons-material/Place"
 import DeleteIcon from "@mui/icons-material/Delete"
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator"
 import ViewListIcon from "@mui/icons-material/ViewList"
 import MapIcon from "@mui/icons-material/Map"
+import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import Map from "../Map/Map"
@@ -23,21 +25,29 @@ import SelectedStopMarkers from "../Map/SelectedStopMarkers"
 import StartEndMarkers from "../Map/StartEndMarkers"
 import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
 import useIsMobile from "../../hooks/useIsMobile"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
 
 function StopCard({
   stop,
   index,
   onRemove,
+  dragHandleProps,
 }: {
   stop: Place
   index: number
   onRemove: (id: string) => void
+  dragHandleProps: React.HTMLAttributes<HTMLDivElement> | null | undefined
 }) {
   return (
     <Card sx={{ display: "flex", alignItems: "flex-start", p: 1.5, gap: 1.5 }}>
-      <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0 }}>
+      <Box
+        {...dragHandleProps}
+        sx={{ display: "flex", alignItems: "center", cursor: "grab", px: 0.5, color: "text.disabled", alignSelf: "center" }}
+      >
+        <DragIndicatorIcon fontSize="small" />
+      </Box>
+      <Avatar sx={{ bgcolor: "primary.main", width: 28, height: 28, fontSize: 13, flexShrink: 0, alignSelf: "center" }}>
         {index + 1}
       </Avatar>
       {stop.photoUrl ? (
@@ -74,7 +84,7 @@ function StopCard({
         color="error"
         aria-label="remove stop"
         onClick={() => onRemove(stop.id)}
-        sx={{ flexShrink: 0 }}
+        sx={{ flexShrink: 0, alignSelf: "center" }}
       >
         <DeleteIcon fontSize="small" />
       </IconButton>
@@ -101,6 +111,16 @@ export default function TripSummary() {
       type: "SET_SELECTED_STOPS",
       payload: selectedStops.filter((s) => s.id !== id),
     })
+  }
+
+  const waypoints = useMemo(() => selectedStops.map((s) => s.latLng), [selectedStops])
+
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return
+    const reordered = [...selectedStops]
+    const [moved] = reordered.splice(result.source.index, 1)
+    reordered.splice(result.destination.index, 0, moved)
+    dispatch({ type: "SET_SELECTED_STOPS", payload: reordered })
   }
 
   return (
@@ -204,11 +224,29 @@ export default function TripSummary() {
                 No stops selected. Go back to add some!
               </Paragraph>
             ) : (
-              <Stack spacing={1.5}>
-                {selectedStops.map((stop, index) => (
-                  <StopCard key={stop.id} stop={stop} index={index} onRemove={removeStop} />
-                ))}
-              </Stack>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="stops">
+                  {(provided) => (
+                    <Stack spacing={1.5} ref={provided.innerRef} {...provided.droppableProps}>
+                      {selectedStops.map((stop, index) => (
+                        <Draggable key={stop.id} draggableId={stop.id} index={index}>
+                          {(provided) => (
+                            <div ref={provided.innerRef} {...provided.draggableProps}>
+                              <StopCard
+                                stop={stop}
+                                index={index}
+                                onRemove={removeStop}
+                                dragHandleProps={provided.dragHandleProps}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </Stack>
+                  )}
+                </Droppable>
+              </DragDropContext>
             )}
           </Box>
         </Box>
@@ -228,6 +266,7 @@ export default function TripSummary() {
                 <RoutePolyline
                   startLatLng={startLatLng}
                   endLatLng={endLatLng}
+                  waypoints={waypoints}
                   fetchPlaces={false}
                 />
               )}

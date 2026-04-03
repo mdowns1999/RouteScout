@@ -112,30 +112,28 @@ export default function LocationsView() {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel id="duration-label">Trip Duration</InputLabel>
+                  <InputLabel id="rank-label">Prioritize Stops By</InputLabel>
                   <Select
-                    labelId="duration-label"
-                    label="Trip Duration"
-                    value={state.duration}
-                    onChange={(e) => dispatch({ type: "SET_DURATION", payload: e.target.value })}
+                    labelId="rank-label"
+                    label="Prioritize Stops By"
+                    value={state.rankPreference}
+                    onChange={(e) => dispatch({ type: "SET_RANK_PREFERENCE", payload: e.target.value })}
                   >
-                    <MenuItem value="1">1 Day</MenuItem>
-                    <MenuItem value="2-3">2–3 Days</MenuItem>
-                    <MenuItem value="4-7">4–7 Days</MenuItem>
-                    <MenuItem value="7+">7+ Days</MenuItem>
+                    <MenuItem value="POPULARITY">Top Rated</MenuItem>
+                    <MenuItem value="DISTANCE">Closest to Route</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel id="pace-label">Travel Pace</InputLabel>
+                  <InputLabel id="radius-label">Distance from Route</InputLabel>
                   <Select
-                    labelId="pace-label"
-                    label="Travel Pace"
-                    value={state.travelPace}
-                    onChange={(e) => dispatch({ type: "SET_PACE", payload: e.target.value })}
+                    labelId="radius-label"
+                    label="Distance from Route"
+                    value={state.searchRadius}
+                    onChange={(e) => dispatch({ type: "SET_SEARCH_RADIUS", payload: e.target.value })}
                   >
-                    <MenuItem value="relaxed">Relaxed</MenuItem>
-                    <MenuItem value="moderate">Moderate</MenuItem>
-                    <MenuItem value="fast">Fast-Paced</MenuItem>
+                    <MenuItem value="5">Within 5 miles</MenuItem>
+                    <MenuItem value="10">Within 10 miles</MenuItem>
+                    <MenuItem value="25">Within 25 miles</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

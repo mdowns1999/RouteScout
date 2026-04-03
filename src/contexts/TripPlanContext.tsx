@@ -18,6 +18,9 @@ export interface Place {
   types: string[]
   distanceFromStart: number   // miles
   driveTimeFromStart: string  // e.g. "1h 10m"
+  phone: string | null
+  description: string | null
+  mapsUrl: string | null
 }
 
 export interface TripPlanData {
@@ -27,8 +30,8 @@ export interface TripPlanData {
   startLatLng: LatLng | null
   endLatLng: LatLng | null
   budget: string
-  duration: string
-  travelPace: string          // was: pace
+  rankPreference: string      // was: duration — "POPULARITY" | "DISTANCE"
+  searchRadius: string        // was: travelPace — miles as string
 
   // Step 2: Interests
   selectedInterests: string[]
@@ -50,8 +53,8 @@ type TripPlanAction =
   | { type: "SET_START_LATLNG"; payload: LatLng | null }
   | { type: "SET_END_LATLNG"; payload: LatLng | null }
   | { type: "SET_BUDGET"; payload: string }
-  | { type: "SET_DURATION"; payload: string }
-  | { type: "SET_PACE"; payload: string }                  // writes to travelPace
+  | { type: "SET_RANK_PREFERENCE"; payload: string }
+  | { type: "SET_SEARCH_RADIUS"; payload: string }
   | { type: "SET_SELECTED_INTERESTS"; payload: string[] }
   | { type: "SET_AVAILABLE_STOPS"; payload: Place[] }
   | { type: "SET_SELECTED_STOPS"; payload: Place[] }
@@ -103,8 +106,8 @@ const initialState: TripPlanData = {
   startLatLng: null,
   endLatLng: null,
   budget: "0-50",
-  duration: "1",
-  travelPace: "",
+  rankPreference: "POPULARITY",
+  searchRadius: "25",
   selectedInterests: [],
   availableStops: [],
   selectedStops: [],
@@ -126,10 +129,10 @@ function tripPlanReducer(state: TripPlanData, action: TripPlanAction): TripPlanD
       return { ...state, endLatLng: action.payload }
     case "SET_BUDGET":
       return { ...state, budget: action.payload }
-    case "SET_DURATION":
-      return { ...state, duration: action.payload }
-    case "SET_PACE":
-      return { ...state, travelPace: action.payload }
+    case "SET_RANK_PREFERENCE":
+      return { ...state, rankPreference: action.payload }
+    case "SET_SEARCH_RADIUS":
+      return { ...state, searchRadius: action.payload }
     case "SET_SELECTED_INTERESTS":
       return { ...state, selectedInterests: action.payload }
     case "SET_AVAILABLE_STOPS":

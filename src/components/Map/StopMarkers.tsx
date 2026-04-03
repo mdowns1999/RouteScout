@@ -16,6 +16,8 @@ import StorefrontIcon from "@mui/icons-material/Storefront"
 import AttractionsIcon from "@mui/icons-material/Attractions"
 import MusicNoteIcon from "@mui/icons-material/MusicNote"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
+import PlaceIcon from "@mui/icons-material/Place"
+import PhoneIcon from "@mui/icons-material/Phone"
 import type { SvgIconProps } from "@mui/material"
 import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
 import Paragraph from "../UI/Paragraph/Paragraph"
@@ -34,14 +36,16 @@ const TYPE_ICONS: Record<string, React.ComponentType<SvgIconProps>> = {
   art_gallery:             ColorLensIcon,
   performing_arts_theater: ColorLensIcon,
   sports_complex:          SportsIcon,
-  rock_climbing_gym:       SportsIcon,
+  climbing_gym:            SportsIcon,
   shopping_mall:           LocalMallIcon,
   market:                  StorefrontIcon,
   store:                   StorefrontIcon,
   tourist_attraction:      AttractionsIcon,
   amusement_park:          AttractionsIcon,
   night_club:              MusicNoteIcon,
-  point_of_interest:       LocationOnIcon,
+  scenic_viewpoint:        NaturePeopleIcon,
+  botanical_garden:        ParkIcon,
+  visitor_center:          LocationOnIcon,
 }
 
 function getIcon(types: string[]): React.ComponentType<SvgIconProps> {
@@ -86,17 +90,17 @@ export default function StopMarkers() {
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                bgcolor: isSelected ? "#1a6b6b" : "rgba(26,107,107,0.45)",
-                border: isSelected ? "2px solid #fff" : "1.5px solid #1a6b6b",
+                bgcolor: isSelected ? "#f4b942" : "rgba(26,107,107,0.45)",
+                border: isSelected ? "2px solid #f4b942" : "1.5px solid #1a6b6b",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                boxShadow: isSelected ? "0 2px 6px rgba(0,0,0,0.35)" : "none",
+                boxShadow: isSelected ? "0 2px 8px rgba(244,185,66,0.5)" : "none",
                 transition: "all 0.15s",
               }}
             >
-              <Icon sx={{ color: "#fff", fontSize: 18 }} />
+              <Icon sx={{ color: isSelected ? "#333" : "#fff", fontSize: 18 }} />
             </Box>
           </AdvancedMarker>
         )
@@ -108,7 +112,7 @@ export default function StopMarkers() {
           pixelOffset={[0, -40]}
           onCloseClick={() => setOpenStopId(null)}
         >
-          <Box sx={{ maxWidth: 220, p: 0.5 }}>
+          <Box sx={{ maxWidth: 260, p: 0.5 }}>
             {openStop.photoUrl && (
               <Box
                 component="img"
@@ -117,15 +121,50 @@ export default function StopMarkers() {
                 sx={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 1, mb: 1 }}
               />
             )}
-            <Paragraph size="sm" sx={{ fontWeight: "bold", mb: 0.5 }}>
-              {openStop.name}
-            </Paragraph>
+
+            {/* Name as Google Maps link */}
+            <Box component="a"
+              href={openStop.mapsUrl ?? `https://maps.google.com/?q=${encodeURIComponent(openStop.name)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+            >
+              <Paragraph size="sm" sx={{ fontWeight: "bold", mb: 0.25, color: "primary.main" }}>
+                {openStop.name}
+              </Paragraph>
+            </Box>
+
+            {/* Description */}
+            {openStop.description && (
+              <Paragraph size="xs" sx={{ mb: 0.75, fontStyle: "italic", color: "text.secondary" }}>
+                {openStop.description}
+              </Paragraph>
+            )}
+
+            {/* Address */}
+            {openStop.address && (
+              <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5, mb: 0.25 }}>
+                <PlaceIcon sx={{ fontSize: 13, color: "text.secondary", mt: "2px", flexShrink: 0 }} />
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>{openStop.address}</Paragraph>
+              </Box>
+            )}
+
+            {/* Phone */}
+            {openStop.phone && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.75 }}>
+                <PhoneIcon sx={{ fontSize: 13, color: "text.secondary", flexShrink: 0 }} />
+                <Paragraph size="xs" sx={{ color: "text.secondary" }}>{openStop.phone}</Paragraph>
+              </Box>
+            )}
+
+            {/* Rating */}
             {openStop.rating > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1, mt: 0.5 }}>
                 <Rating value={openStop.rating} precision={0.1} size="small" readOnly />
                 <Paragraph size="xs">({openStop.totalRatings})</Paragraph>
               </Box>
             )}
+
             <Button
               variant={selectedStops.some((s) => s.id === openStop.id) ? "outlined" : "contained"}
               color="secondary"

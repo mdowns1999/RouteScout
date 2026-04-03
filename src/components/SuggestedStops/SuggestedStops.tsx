@@ -18,6 +18,7 @@ import StopMarkers from "../Map/StopMarkers"
 import StartEndMarkers from "../Map/StartEndMarkers"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
+import { CATEGORIES, INTEREST_TYPE_MAP } from "../../constants/categories"
 import useIsMobile from "../../hooks/useIsMobile"
 import { useState } from "react"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
@@ -52,12 +53,17 @@ function StopCard({
             <Paragraph size="xs">({stop.totalRatings})</Paragraph>
           </Box>
         )}
+        {stop.address && (
+          <Paragraph size="xs" sx={{ color: "text.secondary", mt: 0.25 }}>
+            {stop.address}
+          </Paragraph>
+        )}
       </CardContent>
       <Checkbox
         checked={isSelected}
         onChange={() => onToggle(stop)}
         onClick={(e) => e.stopPropagation()}
-        color="secondary"
+        color="warning"
         sx={{ mr: 0.5 }}
       />
     </Card>
@@ -67,6 +73,7 @@ function StopCard({
 export default function SuggestedStops() {
   const isMobile = useIsMobile()
   const [mobileView, setMobileView] = useState<"list" | "map">("list")
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const { state, dispatch } = useTripPlan()
   const { selectedStops, availableStops, startLatLng, endLatLng, startLocation, endLocation } = state
 
@@ -81,6 +88,19 @@ export default function SuggestedStops() {
   }
 
   const isLoadingStops = startLatLng !== null && availableStops.length === 0
+
+  // Categories that have at least one matching stop
+  const availableCategories = state.selectedInterests.filter((catId) =>
+    availableStops.some((s) =>
+      (INTEREST_TYPE_MAP[catId] ?? []).some((t) => s.types.includes(t))
+    )
+  )
+
+  const displayedStops = activeCategory
+    ? availableStops.filter((s) =>
+        (INTEREST_TYPE_MAP[activeCategory] ?? []).some((t) => s.types.includes(t))
+      )
+    : availableStops
 
   return (
     <LayoutBand spacingDirection="all">
@@ -149,11 +169,52 @@ export default function SuggestedStops() {
               />
               {!isLoadingStops && availableStops.length > 0 && (
                 <Paragraph size="xs" sx={{ color: "text.secondary" }}>
-                  of {availableStops.length} available
+                  of {displayedStops.length} {activeCategory ? "filtered" : "available"}
                 </Paragraph>
               )}
             </Box>
           </Box>
+
+          {/* Category filter chips */}
+          {availableStops.length > 0 && availableCategories.length > 1 && (
+            <Box
+              sx={{
+                px: 1.5,
+                py: 0.75,
+                borderBottom: 1,
+                borderColor: "divider",
+                display: "flex",
+                gap: 0.75,
+                overflowX: "auto",
+                flexShrink: 0,
+                "&::-webkit-scrollbar": { display: "none" },
+              }}
+            >
+              <Chip
+                label="All"
+                size="small"
+                variant={!activeCategory ? "filled" : "outlined"}
+                color={!activeCategory ? "warning" : "default"}
+                onClick={() => setActiveCategory(null)}
+                sx={{ flexShrink: 0 }}
+              />
+              {availableCategories.map((catId) => {
+                const cat = CATEGORIES.find((c) => c.id === catId)!
+                const isActive = activeCategory === catId
+                return (
+                  <Chip
+                    key={catId}
+                    label={cat.title}
+                    size="small"
+                    variant={isActive ? "filled" : "outlined"}
+                    color={isActive ? "warning" : "default"}
+                    onClick={() => setActiveCategory(isActive ? null : catId)}
+                    sx={{ flexShrink: 0 }}
+                  />
+                )
+              })}
+            </Box>
+          )}
 
           {/* Scrollable stop list */}
           <Box sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
@@ -165,9 +226,13 @@ export default function SuggestedStops() {
               <Paragraph size="sm" sx={{ p: 1 }}>
                 No stops found. Try selecting more interests.
               </Paragraph>
+            ) : displayedStops.length === 0 ? (
+              <Paragraph size="sm" sx={{ p: 1 }}>
+                No stops found for this category.
+              </Paragraph>
             ) : (
               <Stack spacing={1}>
-                {availableStops.map((stop) => {
+                {displayedStops.map((stop) => {
                   const isSelected = selectedStops.some((s) => s.id === stop.id)
                   return (
                     <StopCard

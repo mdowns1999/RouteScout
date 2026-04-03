@@ -6,40 +6,11 @@ import {
   Box,
   Chip,
   Container,
-  type SvgIconProps,
 } from "@mui/material"
-import RestaurantIcon from "@mui/icons-material/Restaurant"
-import NatureIcon from "@mui/icons-material/Nature"
-import MuseumIcon from "@mui/icons-material/Museum"
-import TerrainIcon from "@mui/icons-material/Terrain"
-import CameraAltIcon from "@mui/icons-material/CameraAlt"
-import PaletteIcon from "@mui/icons-material/Palette"
-import MusicNoteIcon from "@mui/icons-material/MusicNote"
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag"
-import StarIcon from "@mui/icons-material/Star"
-import PlaceIcon from "@mui/icons-material/Place"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import { useTripPlan } from "../../contexts/TripPlanContext"
-import type { ComponentType } from "react"
-
-const categories: {
-  id: string
-  title: string
-  description: string
-  Icon: ComponentType<SvgIconProps>
-}[] = [
-  { id: "food",        title: "Food & Dining",        description: "Local restaurants, food trucks, breweries",    Icon: RestaurantIcon },
-  { id: "nature",      title: "Nature & Outdoors",    description: "Parks, hiking trails, scenic viewpoints",      Icon: NatureIcon },
-  { id: "history",     title: "History & Culture",    description: "Museums, historical sites, landmarks",         Icon: MuseumIcon },
-  { id: "adventure",   title: "Adventure Sports",     description: "Hiking, climbing, water sports",               Icon: TerrainIcon },
-  { id: "photography", title: "Photography Spots",    description: "Scenic views, Instagram-worthy locations",     Icon: CameraAltIcon },
-  { id: "arts",        title: "Arts & Entertainment", description: "Galleries, theaters, art districts",           Icon: PaletteIcon },
-  { id: "music",       title: "Music & Nightlife",    description: "Live music venues, bars, clubs",               Icon: MusicNoteIcon },
-  { id: "shopping",    title: "Shopping",             description: "Local markets, unique stores, outlets",        Icon: ShoppingBagIcon },
-  { id: "attractions", title: "Tourist Attractions",  description: "Famous landmarks, theme parks",                Icon: StarIcon },
-  { id: "hidden",      title: "Hidden Gems",          description: "Off-the-beaten-path discoveries",              Icon: PlaceIcon },
-]
+import { CATEGORIES as categories } from "../../constants/categories"
 
 export default function InterestsView() {
   const { state, dispatch } = useTripPlan()

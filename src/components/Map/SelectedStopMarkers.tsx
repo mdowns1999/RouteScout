@@ -35,16 +35,16 @@ export default function SelectedStopMarkers() {
               width: 36,
               height: 36,
               borderRadius: "50%",
-              bgcolor: "#1a6b6b",
-              border: "2px solid #fff",
+              bgcolor: "#f4b942",
+              border: "2px solid #f4b942",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
+              boxShadow: "0 2px 8px rgba(244,185,66,0.5)",
             }}
           >
-            <LocationOnIcon sx={{ color: "#fff", fontSize: 18 }} />
+            <LocationOnIcon sx={{ color: "#333", fontSize: 18 }} />
           </Box>
         </AdvancedMarker>
       ))}
