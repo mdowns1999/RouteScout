@@ -1,5 +1,5 @@
 import { type ReactNode } from "react"
-import { APIProvider, Map as GoogleMap } from "@vis.gl/react-google-maps"
+import { Map as GoogleMap } from "@vis.gl/react-google-maps"
 
 interface MapProps {
   center?: { lat: number; lng: number }
@@ -15,17 +15,15 @@ export default function Map({
   children,
 }: MapProps) {
   return (
-    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-      <div style={{ height, width: "100%" }}>
-        <GoogleMap
-          defaultZoom={zoom}
-          defaultCenter={center}
-          gestureHandling="greedy"
-          mapId="routescout"
-        >
-          {children}
-        </GoogleMap>
-      </div>
-    </APIProvider>
+    <div style={{ height, width: "100%" }}>
+      <GoogleMap
+        defaultZoom={zoom}
+        defaultCenter={center}
+        gestureHandling="greedy"
+        mapId="routescout"
+      >
+        {children}
+      </GoogleMap>
+    </div>
   )
 }

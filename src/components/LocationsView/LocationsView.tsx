@@ -3,6 +3,7 @@ import {
   CardContent,
   Stack,
   TextField,
+  Autocomplete,
   FormControl,
   InputLabel,
   Select,
@@ -18,9 +19,40 @@ import ExploreIcon from "@mui/icons-material/Explore"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import { useTripPlan } from "../../contexts/TripPlanContext"
+import { useMapsLibrary } from "@vis.gl/react-google-maps"
+import { useRef, useState, useCallback } from "react"
 
 export default function LocationsView() {
   const { state, dispatch } = useTripPlan()
+  const placesLib = useMapsLibrary("places")
+  const [startOptions, setStartOptions] = useState<string[]>([])
+  const [endOptions, setEndOptions] = useState<string[]>([])
+  const startToken = useRef<google.maps.places.AutocompleteSessionToken | null>(null)
+  const endToken = useRef<google.maps.places.AutocompleteSessionToken | null>(null)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const fetchSuggestions = useCallback((
+    input: string,
+    tokenRef: React.MutableRefObject<google.maps.places.AutocompleteSessionToken | null>,
+    setOptions: (opts: string[]) => void,
+  ) => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    if (!placesLib || input.length < 2) { setOptions([]); return }
+    debounceTimer.current = setTimeout(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const AutocompleteSuggestion = (placesLib as any).AutocompleteSuggestion
+      if (!AutocompleteSuggestion) return
+      if (!tokenRef.current) tokenRef.current = new placesLib.AutocompleteSessionToken()
+      try {
+        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+          input,
+          sessionToken: tokenRef.current,
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setOptions(suggestions.map((s: any) => s.placePrediction.text.toString()))
+      } catch { setOptions([]) }
+    }, 350)
+  }, [placesLib])
 
   return (
     <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 4 }}>
@@ -57,14 +89,23 @@ export default function LocationsView() {
                 <Heading level="h2" size="h5">Route Details</Heading>
               </Stack>
               <Stack spacing={2}>
-                <TextField
-                  fullWidth
-                  label="Starting Point"
-                  variant="outlined"
-                  placeholder="City, state or address"
-                  value={state.startLocation}
-                  onChange={(e) => dispatch({ type: "SET_STARTING_POINT", payload: e.target.value })}
-                  required
+                <Autocomplete
+                  freeSolo
+                  options={startOptions}
+                  inputValue={state.startLocation}
+                  onInputChange={(_, value) => {
+                    dispatch({ type: "SET_STARTING_POINT", payload: value })
+                    fetchSuggestions(value, startToken, setStartOptions)
+                  }}
+                  onChange={(_, value) => {
+                    if (value) {
+                      dispatch({ type: "SET_STARTING_POINT", payload: value as string })
+                      startToken.current = null
+                    }
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} fullWidth label="Starting Point" variant="outlined" placeholder="City, state or address" required />
+                  )}
                 />
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
                   <IconButton
@@ -75,14 +116,23 @@ export default function LocationsView() {
                     <SwapVertIcon />
                   </IconButton>
                 </Box>
-                <TextField
-                  fullWidth
-                  label="Destination"
-                  variant="outlined"
-                  placeholder="City, state or address"
-                  value={state.endLocation}
-                  onChange={(e) => dispatch({ type: "SET_DESTINATION", payload: e.target.value })}
-                  required
+                <Autocomplete
+                  freeSolo
+                  options={endOptions}
+                  inputValue={state.endLocation}
+                  onInputChange={(_, value) => {
+                    dispatch({ type: "SET_DESTINATION", payload: value })
+                    fetchSuggestions(value, endToken, setEndOptions)
+                  }}
+                  onChange={(_, value) => {
+                    if (value) {
+                      dispatch({ type: "SET_DESTINATION", payload: value as string })
+                      endToken.current = null
+                    }
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} fullWidth label="Destination" variant="outlined" placeholder="City, state or address" required />
+                  )}
                 />
               </Stack>
             </CardContent>

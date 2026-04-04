@@ -5,6 +5,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material"
 import { ThemeModeContext } from "./contexts/ThemeModeContext"
 import type { ThemeMode } from "./contexts/ThemeModeContext"
 import { TripPlanProvider } from "./contexts/TripPlanContext"
+import { APIProvider } from "@vis.gl/react-google-maps"
 
 export default function Root() {
   const getInitialMode = (): ThemeMode => {
@@ -37,9 +38,11 @@ export default function Root() {
     <ThemeModeContext.Provider value={{ mode, toggleColorMode }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <TripPlanProvider>
-          <App />
-        </TripPlanProvider>
+        <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string}>
+          <TripPlanProvider>
+            <App />
+          </TripPlanProvider>
+        </APIProvider>
       </ThemeProvider>
     </ThemeModeContext.Provider>
   )
