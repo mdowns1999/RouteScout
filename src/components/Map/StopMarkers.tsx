@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { AdvancedMarker, InfoWindow } from "@vis.gl/react-google-maps"
 import { Box, Button, Rating } from "@mui/material"
+import useIsMobile from "../../hooks/useIsMobile"
 import RestaurantIcon from "@mui/icons-material/Restaurant"
 import LocalCafeIcon from "@mui/icons-material/LocalCafe"
 import BakeryDiningIcon from "@mui/icons-material/BakeryDining"
@@ -56,6 +57,7 @@ function getIcon(types: string[]): React.ComponentType<SvgIconProps> {
 }
 
 export default function StopMarkers() {
+  const isMobile = useIsMobile()
   const { state, dispatch } = useTripPlan()
   const { availableStops, selectedStops } = state
   const [openStopId, setOpenStopId] = useState<string | null>(null)
@@ -113,7 +115,7 @@ export default function StopMarkers() {
           onCloseClick={() => setOpenStopId(null)}
         >
           <Box sx={{ maxWidth: 260, p: 0.5 }}>
-            {openStop.photoUrl && (
+            {!isMobile && openStop.photoUrl && (
               <Box
                 component="img"
                 src={openStop.photoUrl}

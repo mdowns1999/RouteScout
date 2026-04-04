@@ -40,10 +40,10 @@ function StopCard({
   dragHandleProps: React.HTMLAttributes<HTMLDivElement> | null | undefined
 }) {
   return (
-    <Card sx={{ display: "flex", alignItems: "flex-start", p: 1.5, gap: 1.5 }}>
+    <Card sx={{ display: "flex", alignItems: "flex-start", p: { xs: 1, md: 1.5 }, gap: 1.5 }}>
       <Box
         {...dragHandleProps}
-        sx={{ display: "flex", alignItems: "center", cursor: "grab", px: 0.5, color: "text.disabled", alignSelf: "center" }}
+        sx={{ display: "flex", alignItems: "center", cursor: "grab", p: { xs: 1, md: 0.5 }, color: "text.disabled", alignSelf: "center" }}
       >
         <DragIndicatorIcon fontSize="small" />
       </Box>
@@ -53,12 +53,12 @@ function StopCard({
       {stop.photoUrl ? (
         <CardMedia
           component="img"
-          sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, flexShrink: 0 }}
+          sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, flexShrink: 0, display: { xs: "none", md: "block" } }}
           image={stop.photoUrl}
           alt={stop.name}
         />
       ) : (
-        <Box sx={{ width: 80, height: 80, bgcolor: "grey.200", borderRadius: 1, flexShrink: 0 }} />
+        <Box sx={{ width: 80, height: 80, bgcolor: "grey.200", borderRadius: 1, flexShrink: 0, display: { xs: "none", md: "block" } }} />
       )}
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Paragraph size="sm" sx={{ fontWeight: 600, mb: 0.25 }}>
@@ -84,7 +84,7 @@ function StopCard({
         color="error"
         aria-label="remove stop"
         onClick={() => onRemove(stop.id)}
-        sx={{ flexShrink: 0, alignSelf: "center" }}
+        sx={{ flexShrink: 0, alignSelf: "center", p: { xs: 1, md: 0.5 } }}
       >
         <DeleteIcon fontSize="small" />
       </IconButton>

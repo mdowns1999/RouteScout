@@ -196,12 +196,16 @@ export default function TripExport() {
                 <Paragraph size="xs" sx={{ color: "text.secondary" }}>Drive Time</Paragraph>
               </Box>
             </Stack>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, justifyContent: "center" }}>
-              <PlaceIcon sx={{ fontSize: 14, color: "secondary.main", flexShrink: 0 }} />
-              <Paragraph size="sm" sx={{ fontWeight: 600 }}>{state.startLocation}</Paragraph>
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: "center", gap: { xs: 0.5, sm: 0.75 }, justifyContent: "center" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <PlaceIcon sx={{ fontSize: 14, color: "secondary.main", flexShrink: 0 }} />
+                <Paragraph size="sm" sx={{ fontWeight: 600, textAlign: "center" }}>{state.startLocation}</Paragraph>
+              </Box>
               <Paragraph size="sm" sx={{ color: "text.disabled" }}>→</Paragraph>
-              <Paragraph size="sm" sx={{ fontWeight: 600 }}>{state.endLocation}</Paragraph>
-              <PlaceIcon sx={{ fontSize: 14, color: "error.main", flexShrink: 0 }} />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Paragraph size="sm" sx={{ fontWeight: 600, textAlign: "center" }}>{state.endLocation}</Paragraph>
+                <PlaceIcon sx={{ fontSize: 14, color: "error.main", flexShrink: 0 }} />
+              </Box>
             </Box>
           </CardContent>
         </Card>

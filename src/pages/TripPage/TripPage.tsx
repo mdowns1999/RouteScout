@@ -149,7 +149,20 @@ export default function TripPage() {
       {stepComponents[progress]}
 
       {/* Nav buttons */}
-      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, pb: 4 }}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          px: { xs: 2, sm: 3, md: 4 },
+          pb: { xs: 1.5, md: 4 },
+          pt: { xs: 1.5, md: 0 },
+          position: { xs: "sticky", md: "static" },
+          bottom: 0,
+          bgcolor: "background.default",
+          borderTop: { xs: 1, md: 0 },
+          borderColor: "divider",
+          zIndex: 10,
+        }}
+      >
         {geocodeError && (
           <Alert severity="error" sx={{ mb: 2 }} onClose={() => setGeocodeError(null)}>
             {geocodeError}
