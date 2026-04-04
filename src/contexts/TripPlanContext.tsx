@@ -43,6 +43,9 @@ export interface TripPlanData {
   // Route stats (set after Routes API call)
   totalDistanceMiles: number
   totalDriveTime: string
+
+  // Backend
+  tripId: string | null
 }
 
 // --- Action Types ---
@@ -59,6 +62,7 @@ type TripPlanAction =
   | { type: "SET_AVAILABLE_STOPS"; payload: Place[] }
   | { type: "SET_SELECTED_STOPS"; payload: Place[] }
   | { type: "SET_ROUTE_STATS"; payload: { distanceMiles: number; driveTime: string } }
+  | { type: "SET_TRIP_ID"; payload: string }
   | { type: "SWAP_LOCATIONS" }
   | { type: "RESET" }
 
@@ -113,6 +117,7 @@ const initialState: TripPlanData = {
   selectedStops: [],
   totalDistanceMiles: 0,
   totalDriveTime: "",
+  tripId: null,
 }
 
 // --- Reducer ---
@@ -141,6 +146,8 @@ function tripPlanReducer(state: TripPlanData, action: TripPlanAction): TripPlanD
       return { ...state, selectedStops: action.payload }
     case "SET_ROUTE_STATS":
       return { ...state, totalDistanceMiles: action.payload.distanceMiles, totalDriveTime: action.payload.driveTime }
+    case "SET_TRIP_ID":
+      return { ...state, tripId: action.payload }
     case "SWAP_LOCATIONS":
       return {
         ...state,
@@ -162,11 +169,11 @@ const TripPlanContext = createContext<TripPlanContextType | undefined>(undefined
 
 // --- Provider ---
 
-export function TripPlanProvider({ children }: { children: ReactNode }) {
+export function TripPlanProvider({ children, initialState: seedState }: { children: ReactNode; initialState?: TripPlanData }) {
   const [state, dispatch] = useReducer(
     tripPlanReducer,
     initialState,
-    (init): TripPlanData => loadFromStorage() ?? init,
+    (init): TripPlanData => seedState ?? loadFromStorage() ?? init,
   )
 
   useEffect(() => {

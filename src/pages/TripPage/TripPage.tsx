@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Chip, CircularProgress, Container, LinearProgress, Stack } from "@mui/material"
+import { Alert, Box, Button, Chip, CircularProgress, Container, LinearProgress, Snackbar, Stack } from "@mui/material"
 import { useNavigate } from "react-router-dom"
 import Paragraph from "../../components/UI/Paragraph/Paragraph"
 import useIsMobile from "../../hooks/useIsMobile"
@@ -8,6 +8,7 @@ import InterestsView from "../../components/InterestsView/InterestsView"
 import SuggestedStops from "../../components/SuggestedStops/SuggestedStops"
 import TripSummary from "../../components/TripSummary/TripSummary"
 import { useTripPlan } from "../../contexts/TripPlanContext"
+import { createTrip } from "../../services/tripApi"
 
 interface ProgressLabelProps {
   number: string
@@ -54,6 +55,8 @@ export default function TripPage() {
   const { state, dispatch, isStep1Valid, isStep2Valid, isStep3Valid } = useTripPlan()
   const [isGeocoding, setIsGeocoding] = useState(false)
   const [geocodeError, setGeocodeError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveErrorOpen, setSaveErrorOpen] = useState(false)
 
   const isCurrentStepValid = () => {
     switch (progress) {
@@ -180,15 +183,38 @@ export default function TripPage() {
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => navigate("/trip/export")}
-              disabled={!isCurrentStepValid()}
+              onClick={async () => {
+                setIsSaving(true)
+                try {
+                  const tripId = await createTrip(state)
+                  dispatch({ type: "SET_TRIP_ID", payload: tripId })
+                } catch {
+                  setSaveErrorOpen(true)
+                } finally {
+                  setIsSaving(false)
+                  navigate("/trip/export")
+                }
+              }}
+              disabled={!isCurrentStepValid() || isSaving}
+              startIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : undefined}
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              {step.nextLabel}
+              {isSaving ? "Saving trip…" : step.nextLabel}
             </Button>
           )}
         </Stack>
       </Container>
+
+      <Snackbar
+        open={saveErrorOpen}
+        autoHideDuration={5000}
+        onClose={() => setSaveErrorOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="warning" onClose={() => setSaveErrorOpen(false)} sx={{ width: "100%" }}>
+          Could not save your trip — share link will be unavailable, but export still works.
+        </Alert>
+      </Snackbar>
     </>
   )
 }
