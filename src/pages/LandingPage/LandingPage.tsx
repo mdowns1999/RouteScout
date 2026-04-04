@@ -48,8 +48,7 @@ export default function LandingPage() {
           Ready to Plan Your Adventure?
         </Heading>
         <Paragraph centered>
-          Join thousands of travelers who have discovered amazing places with
-          RouteScout
+          Ready to find the best stops between here and there?
         </Paragraph>
         <Box sx={{ textAlign: "center", py: 2 }}>
           <Button

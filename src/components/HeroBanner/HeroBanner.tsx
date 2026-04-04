@@ -50,9 +50,8 @@ export default function HeroBanner() {
             Plan Your Perfect Road Trip
           </Heading>
           <Paragraph centered>
-            Create unforgettable journeys with smart stop suggestions,
-            interactive maps, and seamless export to your favorite navigation
-            apps
+            Pick your route, choose what interests you, and get a curated list
+            of stops ready to send to Google or Apple Maps
           </Paragraph>
           <Box sx={{ textAlign: "center", mt: 3 }}>
             <Button

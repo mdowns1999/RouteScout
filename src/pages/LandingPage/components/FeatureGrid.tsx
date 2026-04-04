@@ -8,7 +8,7 @@ import ExploreIcon from "@mui/icons-material/Explore"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import ShareIcon from "@mui/icons-material/Share"
 import TuneIcon from "@mui/icons-material/Tune"
-import CloudDownloadIcon from "@mui/icons-material/CloudDownload"
+import SpeedIcon from "@mui/icons-material/Speed"
 
 const getIconCircleCss = (theme: Theme, color: string) => css`
   background-color: ${color};
@@ -38,7 +38,7 @@ export default function FeatureGrid() {
     {
       icon: <StarIcon />,
       title: "Smart Stop Suggestions",
-      description: "AI-powered recommendations based on your interests and route",
+      description: "Stops sourced from Google Places, filtered by your interests and how far they are from your route",
       color: theme.palette.warning.main, // Golden Sun
     },
     {
@@ -51,7 +51,7 @@ export default function FeatureGrid() {
       icon: <FileDownloadIcon />,
       title: "Export to Navigation Apps",
       description:
-        "Seamlessly export to Google Maps, Apple Maps, or download as PDF",
+        "Open in Google Maps with all waypoints, send to Apple Maps, or download a GPX file for any GPS device",
       color: theme.palette.secondary.main, // Palm Green
     },
     {
@@ -64,14 +64,14 @@ export default function FeatureGrid() {
       icon: <TuneIcon />,
       title: "Flexible Planning",
       description:
-        "Reorder stops, add custom locations, and adjust your itinerary",
+        "Drag and drop stops into your preferred order, or remove any stop with a single click",
       color: theme.palette.error.main, // Adventure Red
     },
     {
-      icon: <CloudDownloadIcon />,
-      title: "Offline Access",
+      icon: <SpeedIcon />,
+      title: "Real-Time Trip Stats",
       description:
-        "Download your trip details for offline access during your journey",
+        "See total miles and estimated drive time update live as you add or reorder stops",
       color: theme.palette.secondary.dark, // Darker Palm Green
     },
   ]

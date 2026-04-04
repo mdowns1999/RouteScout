@@ -7,6 +7,7 @@ import Separator from "../../../components/UI/Separator/Separator"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
 import StarBorderIcon from "@mui/icons-material/StarBorder"
 import MapIcon from "@mui/icons-material/Map"
+import ExploreIcon from "@mui/icons-material/Explore"
 
 const getIconCircleCss = (theme: Theme) => css`
   text-align: center;
@@ -40,26 +41,32 @@ export default function CardGrid() {
       icon: <LocationOnIcon fontSize="large" />,
       title: "Set Your Route",
       description:
-        "Enter your starting point and destination, plus any travel preferences",
+        "Enter start and end locations, set your budget, and choose how to prioritize stops",
     },
     {
       icon: <StarBorderIcon fontSize="large" />,
-      title: "Choose Your Activities",
+      title: "Choose Your Interests",
       description:
-        "Select from categories like food, nature, history, and attractions",
+        "Pick from 10 categories — food, nature, history, hidden gems, and more",
     },
     {
       icon: <MapIcon fontSize="large" />,
-      title: "Get Your Trip",
+      title: "Pick Your Stops",
       description:
-        "Review smart suggestions and export your trip to Google or Apple Maps",
+        "Browse stops from Google Places on an interactive map and select the ones you want",
+    },
+    {
+      icon: <ExploreIcon fontSize="large" />,
+      title: "Review & Export",
+      description:
+        "Drag-and-drop to reorder stops, then send to Google Maps, Apple Maps, or save as GPX",
     },
   ]
 
   return (
     <Grid container spacing={8}>
       {cardContent.map((card) => (
-        <Grid size={{ sm: 12, md: 4 }} key={card.title}>
+        <Grid size={{ sm: 12, md: 3 }} key={card.title}>
           <Card
             elevation={2}
             sx={{

@@ -18,7 +18,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: "/route-scout" },
+  { basename: "/RouteScout" },
 )
 
 function App() {
