@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RouteScout</title>
+    <script>
+      // GitHub Pages SPA redirect
+      // Encodes the full path/query/hash into a ?p= param and redirects to the root,
+      // where index.html will decode it and hand it to React Router.
+      var l = window.location
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + 1).join('/') + '/?p=' +
+        encodeURIComponent(l.pathname.slice(1) + (l.search ? l.search : '') + l.hash)
+      )
+    </script>
+  </head>
+  <body></body>
+</html>
