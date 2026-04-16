@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react"
-import { Card, CardContent, Grid, useTheme, type Theme } from "@mui/material"
+import { Card, CardContent, Grid, Typography, useTheme, type Theme } from "@mui/material"
 import Heading from "../../../components/UI/Heading/Heading"
 import Paragraph from "../../../components/UI/Paragraph/Paragraph"
 import Separator from "../../../components/UI/Separator/Separator"
@@ -64,9 +64,9 @@ export default function CardGrid() {
   ]
 
   return (
-    <Grid container spacing={8}>
-      {cardContent.map((card) => (
-        <Grid size={{ sm: 12, md: 3 }} key={card.title}>
+    <Grid container spacing={3}>
+      {cardContent.map((card, index) => (
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={card.title}>
           <Card
             elevation={2}
             sx={{
@@ -78,6 +78,14 @@ export default function CardGrid() {
           >
             <div css={cardWrapper}>
               <CardContent sx={{ height: "100%" }}>
+                <Typography
+                  variant="overline"
+                  display="block"
+                  align="center"
+                  sx={{ color: "text.secondary", lineHeight: 1, mb: 1 }}
+                >
+                  Step {index + 1}
+                </Typography>
                 <div css={getIconCircleCss(theme)}>{card.icon}</div>
                 <Separator size="xs" />
                 <Heading level="h3" size="h4" centered>

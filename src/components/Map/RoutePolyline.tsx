@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps"
 import { useTripPlan, type LatLng, type Place } from "../../contexts/TripPlanContext"
 import { INTEREST_TYPE_MAP } from "../../constants/categories"
+import { decodePolyline, formatDriveTime } from "../../utils/routeUtils"
 
 interface RoutePolylineProps {
   startLatLng: LatLng
@@ -25,6 +26,7 @@ interface ApiPlace {
   nationalPhoneNumber?: string
   editorialSummary?: { text: string }
   googleMapsUri?: string
+  priceLevel?: number
 }
 
 // --- Module-level caches (survive re-renders and step navigation; reset on page refresh) ---
@@ -63,29 +65,6 @@ function placesCacheKey(
 
 // --- Pure helper functions ---
 
-function decodePolyline(encoded: string): LatLng[] {
-  const points: LatLng[] = []
-  let index = 0, lat = 0, lng = 0
-  while (index < encoded.length) {
-    let shift = 0, result = 0, byte: number
-    do {
-      byte = encoded.charCodeAt(index++) - 63
-      result |= (byte & 0x1f) << shift
-      shift += 5
-    } while (byte >= 0x20)
-    lat += result & 1 ? ~(result >> 1) : result >> 1
-    shift = 0; result = 0
-    do {
-      byte = encoded.charCodeAt(index++) - 63
-      result |= (byte & 0x1f) << shift
-      shift += 5
-    } while (byte >= 0x20)
-    lng += result & 1 ? ~(result >> 1) : result >> 1
-    points.push({ lat: lat / 1e5, lng: lng / 1e5 })
-  }
-  return points
-}
-
 function haversineDistanceMiles(a: LatLng, b: LatLng): number {
   const R = 3958.8
   const dLat = (b.lat - a.lat) * Math.PI / 180
@@ -95,15 +74,16 @@ function haversineDistanceMiles(a: LatLng, b: LatLng): number {
   return R * 2 * Math.asin(Math.sqrt(h))
 }
 
-function sampleMidpoints(path: LatLng[], intervalMiles: number): LatLng[] {
+function sampleMidpoints(path: LatLng[], intervalMiles: number, maxPoints: number): LatLng[] {
   if (path.length < 2) return path.length === 1 ? [path[0]] : []
   const points: LatLng[] = []
   let accumulated = 0, nextSample = intervalMiles
   for (let i = 1; i < path.length; i++) {
+    if (points.length >= maxPoints) break
     const segDist = haversineDistanceMiles(path[i - 1], path[i])
     const prev = accumulated
     accumulated += segDist
-    while (nextSample <= accumulated) {
+    while (nextSample <= accumulated && points.length < maxPoints) {
       const t = (nextSample - prev) / segDist
       points.push({
         lat: path[i - 1].lat + t * (path[i].lat - path[i - 1].lat),
@@ -113,15 +93,7 @@ function sampleMidpoints(path: LatLng[], intervalMiles: number): LatLng[] {
     }
   }
   if (points.length === 0) points.push(path[Math.floor(path.length / 2)])
-  return points.slice(0, 6)
-}
-
-function formatDriveTime(hours: number): string {
-  const h = Math.floor(hours)
-  const m = Math.round((hours - h) * 60)
-  if (h === 0) return `${m}m`
-  if (m === 0) return `${h}h`
-  return `${h}h ${m}m`
+  return points
 }
 
 function getBudgetPriceLevels(budget: string): string[] {
@@ -166,7 +138,7 @@ async function fetchPlacesAtPoint(
       "X-Goog-FieldMask":
         "places.id,places.displayName,places.formattedAddress,places.location," +
         "places.rating,places.userRatingCount,places.photos,places.types,places.primaryType," +
-        "places.nationalPhoneNumber,places.editorialSummary,places.googleMapsUri",
+        "places.nationalPhoneNumber,places.editorialSummary,places.googleMapsUri,places.priceLevel",
     },
     body: JSON.stringify(body),
   })
@@ -197,6 +169,7 @@ function toPlace(raw: ApiPlace, startLatLng: LatLng, apiKey: string): Place {
     phone: raw.nationalPhoneNumber ?? null,
     description: raw.editorialSummary?.text ?? null,
     mapsUrl: raw.googleMapsUri ?? null,
+    priceLevel: raw.priceLevel ?? 0,
   }
 }
 
@@ -295,10 +268,21 @@ export default function RoutePolyline({ startLatLng, endLatLng, waypoints, fetch
       if (!fetchPlaces || cancelled) return
       if (state.selectedInterests.length === 0) return
 
-      const radiusMeters = parseFloat(state.searchRadius ?? "25") * 1609.34
+      const searchRadiusMiles = parseFloat(state.searchRadius ?? "25")
+      const radiusMeters = searchRadiusMiles * 1609.34
       const priceLevels = getBudgetPriceLevels(state.budget)
       const rankPreference = state.rankPreference ?? "POPULARITY"
-      const midpoints = sampleMidpoints(path, 50)
+
+      // Sample evenly along the full route. Interval = 2× search radius ensures circles
+      // overlap at their edges (no dead zones). Cap at 12 samples to bound API call count.
+      const routeDistanceMiles = routeEntry.totalMeters * 0.000621371
+      const MAX_SAMPLES = 12
+      const sampleCount = Math.max(1, Math.min(
+        Math.ceil(routeDistanceMiles / (searchRadiusMiles * 2)),
+        MAX_SAMPLES
+      ))
+      const intervalMiles = routeDistanceMiles / sampleCount
+      const midpoints = sampleMidpoints(path, intervalMiles, sampleCount)
 
       // One call per category × per midpoint — ensures every selected category gets results
       const allRaw = await Promise.all(
@@ -317,13 +301,13 @@ export default function RoutePolyline({ startLatLng, endLatLng, waypoints, fetch
       dispatch({ type: "SET_AVAILABLE_STOPS", payload: places })
     }
 
-    run().catch(console.error)
+    run().catch(() => { /* errors are handled inside run() via early returns */ })
 
     return () => {
       cancelled = true
       polyline?.setMap(null)
     }
-  }, [map, mapsLib, coreLib, startLatLng, endLatLng, waypoints, state.selectedInterests, state.budget, state.searchRadius, state.rankPreference, dispatch])
+  }, [map, mapsLib, coreLib, startLatLng, endLatLng, waypoints, state.selectedInterests, state.budget, state.searchRadius, state.rankPreference, dispatch, fetchPlaces])
 
   return null
 }

@@ -4,14 +4,13 @@ import {
   Stack,
   TextField,
   Autocomplete,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Grid,
   Box,
   IconButton,
   Container,
+  Slider,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
 import SwapVertIcon from "@mui/icons-material/SwapVert"
@@ -21,6 +20,10 @@ import Paragraph from "../UI/Paragraph/Paragraph"
 import { useTripPlan } from "../../contexts/TripPlanContext"
 import { useMapsLibrary } from "@vis.gl/react-google-maps"
 import { useRef, useState, useCallback } from "react"
+
+const BUDGET_STEPS = ["0-50", "50-100", "100-200", "200+"] as const
+const BUDGET_LABELS = ["$", "$$", "$$$", "$$$$"]
+const BUDGET_DESCRIPTIONS = ["$0–$50 / day", "$50–$100 / day", "$100–$200 / day", "$200+ / day"]
 
 export default function LocationsView() {
   const { state, dispatch } = useTripPlan()
@@ -53,6 +56,9 @@ export default function LocationsView() {
       } catch { setOptions([]) }
     }, 350)
   }, [placesLib])
+
+  const budgetIndex = BUDGET_STEPS.indexOf(state.budget as typeof BUDGET_STEPS[number])
+  const radiusValue = parseInt(state.searchRadius, 10)
 
   return (
     <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 4 }}>
@@ -141,51 +147,72 @@ export default function LocationsView() {
 
         {/* Travel Preferences — 40% */}
         <Grid size={{ xs: 12, md: 5 }}>
-          <Card sx={{ height: "100%" }}>
+          <Card sx={{ height: "100%", padding: 2 }}>
             <CardContent>
               <Heading level="h2" size="h5" sx={{ mb: 2 }}>
                 Travel Preferences
               </Heading>
-              <Stack spacing={2}>
-                <FormControl fullWidth>
-                  <InputLabel id="budget-label">Budget</InputLabel>
-                  <Select
-                    labelId="budget-label"
-                    label="Budget"
-                    value={state.budget}
-                    onChange={(e) => dispatch({ type: "SET_BUDGET", payload: e.target.value })}
-                  >
-                    <MenuItem value="0-50">$0–$50 / day</MenuItem>
-                    <MenuItem value="50-100">$50–$100 / day</MenuItem>
-                    <MenuItem value="100-200">$100–$200 / day</MenuItem>
-                    <MenuItem value="200+">$200+ / day</MenuItem>
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth>
-                  <InputLabel id="rank-label">Prioritize Stops By</InputLabel>
-                  <Select
-                    labelId="rank-label"
-                    label="Prioritize Stops By"
+              <Stack spacing={3}>
+
+                {/* Budget */}
+                <Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", mb: 0.5 }}>
+                    <Paragraph size="sm" sx={{ fontWeight: 600 }}>Budget</Paragraph>
+                    <Paragraph size="xs" sx={{ color: "text.secondary" }}>
+                      {BUDGET_LABELS[budgetIndex]} · {BUDGET_DESCRIPTIONS[budgetIndex]}
+                    </Paragraph>
+                  </Box>
+                  <Slider
+                    min={0}
+                    max={3}
+                    step={1}
+                    value={budgetIndex}
+                    onChange={(_, v) => dispatch({ type: "SET_BUDGET", payload: BUDGET_STEPS[v as number] })}
+                    marks={BUDGET_LABELS.map((label, i) => ({ value: i, label }))}
+                    color="secondary"
+                    sx={{ mt: 1 }}
+                  />
+                </Box>
+
+                {/* Distance from Route */}
+                <Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", mb: 0.5 }}>
+                    <Paragraph size="sm" sx={{ fontWeight: 600 }}>Distance from Route</Paragraph>
+                    <Paragraph size="xs" sx={{ color: "text.secondary" }}>
+                      Within {radiusValue} miles
+                    </Paragraph>
+                  </Box>
+                  <Slider
+                    min={5}
+                    max={25}
+                    step={5}
+                    value={radiusValue}
+                    onChange={(_, v) => dispatch({ type: "SET_SEARCH_RADIUS", payload: String(v) })}
+                    marks={[
+                      { value: 5, label: "5 mi" },
+                      { value: 15, label: "15 mi" },
+                      { value: 25, label: "25 mi" },
+                    ]}
+                    color="secondary"
+                    sx={{ mt: 1 }}
+                  />
+                </Box>
+
+                {/* Prioritize By */}
+                <Box>
+                  <Paragraph size="sm" sx={{ fontWeight: 600, mb: 1 }}>Prioritize Stops By</Paragraph>
+                  <ToggleButtonGroup
                     value={state.rankPreference}
-                    onChange={(e) => dispatch({ type: "SET_RANK_PREFERENCE", payload: e.target.value })}
+                    exclusive
+                    onChange={(_, v) => v && dispatch({ type: "SET_RANK_PREFERENCE", payload: v })}
+                    fullWidth
+                    size="small"
                   >
-                    <MenuItem value="POPULARITY">Top Rated</MenuItem>
-                    <MenuItem value="DISTANCE">Closest to Route</MenuItem>
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth>
-                  <InputLabel id="radius-label">Distance from Route</InputLabel>
-                  <Select
-                    labelId="radius-label"
-                    label="Distance from Route"
-                    value={state.searchRadius}
-                    onChange={(e) => dispatch({ type: "SET_SEARCH_RADIUS", payload: e.target.value })}
-                  >
-                    <MenuItem value="5">Within 5 miles</MenuItem>
-                    <MenuItem value="10">Within 10 miles</MenuItem>
-                    <MenuItem value="25">Within 25 miles</MenuItem>
-                  </Select>
-                </FormControl>
+                    <ToggleButton value="POPULARITY">Top Rated</ToggleButton>
+                    <ToggleButton value="DISTANCE">Closest to Route</ToggleButton>
+                  </ToggleButtonGroup>
+                </Box>
+
               </Stack>
             </CardContent>
           </Card>

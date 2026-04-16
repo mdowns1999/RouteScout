@@ -36,10 +36,18 @@ function StopCard({ stop, index }: { stop: Place; index: number }) {
             {index}
           </Avatar>
           {stop.photoUrl && (
-            <img
+            <Box
+              component="img"
               src={stop.photoUrl}
               alt={stop.name}
-              style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
+              sx={{
+                width: 56,
+                height: 56,
+                objectFit: "cover",
+                borderRadius: 2,
+                flexShrink: 0,
+                display: { xs: "none", md: "block" },
+              }}
             />
           )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -66,7 +74,7 @@ function StopCard({ stop, index }: { stop: Place; index: number }) {
 
 export default function TripExport() {
   const navigate = useNavigate()
-  const { state } = useTripPlan()
+  const { state, resetTrip } = useTripPlan()
   const [snackbarMsg, setSnackbarMsg] = useState("")
   const [snackbarOpen, setSnackbarOpen] = useState(false)
 
@@ -291,7 +299,7 @@ export default function TripExport() {
           <Button variant="outlined" color="secondary" onClick={() => navigate(-1)}>
             Edit This Trip
           </Button>
-          <Button variant="contained" color="secondary" size="large" onClick={() => navigate("/trip")}>
+          <Button variant="contained" color="secondary" size="large" onClick={() => { resetTrip(); navigate("/trip") }}>
             Plan New Trip
           </Button>
         </Stack>

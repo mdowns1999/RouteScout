@@ -41,10 +41,18 @@ function StopCard({ stop, index }: { stop: Place; index: number }) {
             {index}
           </Avatar>
           {stop.photoUrl && (
-            <img
+            <Box
+              component="img"
               src={stop.photoUrl}
               alt={stop.name}
-              style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
+              sx={{
+                width: 56,
+                height: 56,
+                objectFit: "cover",
+                borderRadius: 2,
+                flexShrink: 0,
+                display: { xs: "none", md: "block" },
+              }}
             />
           )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -264,13 +272,10 @@ function TripShareWithContext({ trip }: { trip: TripPlanData }) {
 export default function TripShare() {
   const { id } = useParams<{ id: string }>()
   const [trip, setTrip] = useState<TripPlanData | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(!id ? "Invalid share link." : null)
 
   useEffect(() => {
-    if (!id) {
-      setError("Invalid share link.")
-      return
-    }
+    if (!id) return
     getShareTrip(id)
       .then(setTrip)
       .catch((err: Error) => setError(err.message))

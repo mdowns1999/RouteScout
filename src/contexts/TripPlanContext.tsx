@@ -7,6 +7,24 @@ export interface LatLng {
   lng: number
 }
 
+export type RouteOptionId = 'fastest' | 'scenic' | 'no_highways' | 'no_tolls'
+
+export interface RouteOption {
+  id: RouteOptionId
+  label: string
+  distanceMiles: number
+  durationMinutes: number
+  hasTolls: boolean
+  encodedPolyline: string
+}
+
+export interface StopFilters {
+  minRating: number         // 0 = no filter
+  maxPriceLevel: number     // 0 = no filter, 1–4 otherwise
+  maxDistanceMiles: number  // 0 = no filter
+  categoryIds: string[]     // empty = all categories
+}
+
 export interface Place {
   id: string
   name: string
@@ -21,26 +39,32 @@ export interface Place {
   phone: string | null
   description: string | null
   mapsUrl: string | null
+  priceLevel: number          // 0 = unknown, 1–4
 }
 
 export interface TripPlanData {
   // Step 1: Locations & Preferences
-  startLocation: string       // was: startingPoint
-  endLocation: string         // was: destination
+  startLocation: string
+  endLocation: string
   startLatLng: LatLng | null
   endLatLng: LatLng | null
   budget: string
-  rankPreference: string      // was: duration — "POPULARITY" | "DISTANCE"
-  searchRadius: string        // was: travelPace — miles as string
+  rankPreference: string      // "POPULARITY" | "DISTANCE"
+  searchRadius: string        // miles as string
 
-  // Step 2: Interests
+  // Step 2: Route Selection
+  routeOptions: RouteOption[]
+  selectedRoute: RouteOption | null
+
+  // Step 3: Interests
   selectedInterests: string[]
 
-  // Step 3: Suggested Stops
+  // Step 4: Suggested Stops
   availableStops: Place[]
-  selectedStops: Place[]      // was: string[]
+  selectedStops: Place[]
+  stopFilters: StopFilters
 
-  // Route stats (set after Routes API call)
+  // Route stats (set after route selection or Routes API call)
   totalDistanceMiles: number
   totalDriveTime: string
 
@@ -51,16 +75,19 @@ export interface TripPlanData {
 // --- Action Types ---
 
 type TripPlanAction =
-  | { type: "SET_STARTING_POINT"; payload: string }       // writes to startLocation
-  | { type: "SET_DESTINATION"; payload: string }           // writes to endLocation
+  | { type: "SET_STARTING_POINT"; payload: string }
+  | { type: "SET_DESTINATION"; payload: string }
   | { type: "SET_START_LATLNG"; payload: LatLng | null }
   | { type: "SET_END_LATLNG"; payload: LatLng | null }
   | { type: "SET_BUDGET"; payload: string }
   | { type: "SET_RANK_PREFERENCE"; payload: string }
   | { type: "SET_SEARCH_RADIUS"; payload: string }
+  | { type: "SET_ROUTE_OPTIONS"; payload: RouteOption[] }
+  | { type: "SET_SELECTED_ROUTE"; payload: RouteOption }
   | { type: "SET_SELECTED_INTERESTS"; payload: string[] }
   | { type: "SET_AVAILABLE_STOPS"; payload: Place[] }
   | { type: "SET_SELECTED_STOPS"; payload: Place[] }
+  | { type: "SET_STOP_FILTERS"; payload: StopFilters }
   | { type: "SET_ROUTE_STATS"; payload: { distanceMiles: number; driveTime: string } }
   | { type: "SET_TRIP_ID"; payload: string }
   | { type: "SWAP_LOCATIONS" }
@@ -74,6 +101,7 @@ interface TripPlanContextType {
   isStep1Valid: () => boolean
   isStep2Valid: () => boolean
   isStep3Valid: () => boolean
+  isStep4Valid: () => boolean
   resetTrip: () => void
 }
 
@@ -86,8 +114,8 @@ function loadFromStorage(): TripPlanData | null {
     const raw = sessionStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw) as Record<string, unknown>
-    // Guard against stale data from before the field rename
     if (typeof parsed.startLocation !== "string") return null
+    if (!Array.isArray(parsed.routeOptions)) return null
     return parsed as unknown as TripPlanData
   } catch {
     return null
@@ -111,10 +139,13 @@ const initialState: TripPlanData = {
   endLatLng: null,
   budget: "0-50",
   rankPreference: "POPULARITY",
-  searchRadius: "25",
+  searchRadius: "5",
+  routeOptions: [],
+  selectedRoute: null,
   selectedInterests: [],
   availableStops: [],
   selectedStops: [],
+  stopFilters: { minRating: 0, maxPriceLevel: 0, maxDistanceMiles: 0, categoryIds: [] },
   totalDistanceMiles: 0,
   totalDriveTime: "",
   tripId: null,
@@ -138,12 +169,18 @@ function tripPlanReducer(state: TripPlanData, action: TripPlanAction): TripPlanD
       return { ...state, rankPreference: action.payload }
     case "SET_SEARCH_RADIUS":
       return { ...state, searchRadius: action.payload }
+    case "SET_ROUTE_OPTIONS":
+      return { ...state, routeOptions: action.payload }
+    case "SET_SELECTED_ROUTE":
+      return { ...state, selectedRoute: action.payload }
     case "SET_SELECTED_INTERESTS":
       return { ...state, selectedInterests: action.payload }
     case "SET_AVAILABLE_STOPS":
       return { ...state, availableStops: action.payload }
     case "SET_SELECTED_STOPS":
       return { ...state, selectedStops: action.payload }
+    case "SET_STOP_FILTERS":
+      return { ...state, stopFilters: action.payload }
     case "SET_ROUTE_STATS":
       return { ...state, totalDistanceMiles: action.payload.distanceMiles, totalDriveTime: action.payload.driveTime }
     case "SET_TRIP_ID":
@@ -184,9 +221,12 @@ export function TripPlanProvider({ children, initialState: seedState }: { childr
     state.startLocation.trim() !== "" && state.endLocation.trim() !== ""
 
   const isStep2Valid = (): boolean =>
-    state.selectedInterests.length > 0
+    state.selectedRoute !== null
 
   const isStep3Valid = (): boolean =>
+    state.selectedInterests.length > 0
+
+  const isStep4Valid = (): boolean =>
     state.selectedStops.length > 0
 
   const resetTrip = (): void => {
@@ -196,7 +236,7 @@ export function TripPlanProvider({ children, initialState: seedState }: { childr
 
   return (
     <TripPlanContext.Provider
-      value={{ state, dispatch, isStep1Valid, isStep2Valid, isStep3Valid, resetTrip }}
+      value={{ state, dispatch, isStep1Valid, isStep2Valid, isStep3Valid, isStep4Valid, resetTrip }}
     >
       {children}
     </TripPlanContext.Provider>
@@ -205,6 +245,7 @@ export function TripPlanProvider({ children, initialState: seedState }: { childr
 
 // --- Hook ---
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTripPlan() {
   const context = useContext(TripPlanContext)
   if (context === undefined) {

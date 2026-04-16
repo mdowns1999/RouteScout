@@ -4,6 +4,7 @@ import Paragraph from "../../components/UI/Paragraph/Paragraph"
 import useIsMobile from "../../hooks/useIsMobile"
 import { useState } from "react"
 import LocationsView from "../../components/LocationsView/LocationsView"
+import RouteSelectionView from "../../components/RouteSelectionView/RouteSelectionView"
 import InterestsView from "../../components/InterestsView/InterestsView"
 import SuggestedStops from "../../components/SuggestedStops/SuggestedStops"
 import TripSummary from "../../components/TripSummary/TripSummary"
@@ -34,15 +35,19 @@ const ProgressLabel: React.FC<ProgressLabelProps> = ({
   </Stack>
 )
 
+const geocodeCache = new Map<string, { lat: number; lng: number }>()
+
 const steps = [
-  { number: "1", label: "Locations",  progress: 25,  nextLabel: "Continue to Interests",       prevLabel: null },
-  { number: "2", label: "Interests",  progress: 50,  nextLabel: "Continue to Suggested Stops", prevLabel: "Back to Locations" },
-  { number: "3", label: "Stops",      progress: 75,  nextLabel: "Continue to Trip Summary",    prevLabel: "Back to Interests" },
-  { number: "4", label: "Summary",    progress: 100, nextLabel: "Export Your Trip",            prevLabel: "Back to Suggested Stops" },
+  { number: "1", label: "Locations",  progress: 20,  nextLabel: "Continue to Route",           prevLabel: null },
+  { number: "2", label: "Route",      progress: 40,  nextLabel: "Continue to Interests",       prevLabel: "Back to Locations" },
+  { number: "3", label: "Interests",  progress: 60,  nextLabel: "Continue to Suggested Stops", prevLabel: "Back to Route" },
+  { number: "4", label: "Stops",      progress: 80,  nextLabel: "Continue to Trip Summary",    prevLabel: "Back to Interests" },
+  { number: "5", label: "Summary",    progress: 100, nextLabel: "Export Your Trip",            prevLabel: "Back to Suggested Stops" },
 ]
 
 const stepComponents = [
   <LocationsView />,
+  <RouteSelectionView />,
   <InterestsView />,
   <SuggestedStops />,
   <TripSummary />,
@@ -52,7 +57,7 @@ export default function TripPage() {
   const isMobile = useIsMobile()
   const navigate = useNavigate()
   const [progress, setProgress] = useState(0)
-  const { state, dispatch, isStep1Valid, isStep2Valid, isStep3Valid } = useTripPlan()
+  const { state, dispatch, isStep1Valid, isStep2Valid, isStep3Valid, isStep4Valid } = useTripPlan()
   const [isGeocoding, setIsGeocoding] = useState(false)
   const [geocodeError, setGeocodeError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -63,6 +68,7 @@ export default function TripPage() {
       case 0: return isStep1Valid()
       case 1: return isStep2Valid()
       case 2: return isStep3Valid()
+      case 3: return isStep4Valid()
       default: return true
     }
   }
@@ -74,20 +80,47 @@ export default function TripPage() {
       try {
         const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
         const enc = encodeURIComponent
-        const [startRes, endRes] = await Promise.all([
-          fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${enc(state.startLocation)}&key=${apiKey}`).then((r) => r.json()),
-          fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${enc(state.endLocation)}&key=${apiKey}`).then((r) => r.json()),
-        ])
-        if (startRes.status !== "OK") {
-          setGeocodeError(`Could not find "${state.startLocation}". Please check the address and try again.`)
-          return
-        }
-        if (endRes.status !== "OK") {
-          setGeocodeError(`Could not find "${state.endLocation}". Please check the address and try again.`)
-          return
-        }
-        dispatch({ type: "SET_START_LATLNG", payload: startRes.results[0].geometry.location })
-        dispatch({ type: "SET_END_LATLNG", payload: endRes.results[0].geometry.location })
+
+        const cachedStart = geocodeCache.get(state.startLocation)
+        const cachedEnd = geocodeCache.get(state.endLocation)
+
+        const [startLatLng, endLatLng] = await Promise.all([
+          cachedStart
+            ? Promise.resolve(cachedStart)
+            : fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${enc(state.startLocation)}&key=${apiKey}`)
+                .then((r) => r.json())
+                .then((res) => {
+                  if (res.status !== "OK") throw new Error(`start:${res.status}`)
+                  const loc = res.results[0].geometry.location as { lat: number; lng: number }
+                  geocodeCache.set(state.startLocation, loc)
+                  return loc
+                }),
+          cachedEnd
+            ? Promise.resolve(cachedEnd)
+            : fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${enc(state.endLocation)}&key=${apiKey}`)
+                .then((r) => r.json())
+                .then((res) => {
+                  if (res.status !== "OK") throw new Error(`end:${res.status}`)
+                  const loc = res.results[0].geometry.location as { lat: number; lng: number }
+                  geocodeCache.set(state.endLocation, loc)
+                  return loc
+                }),
+        ]).catch((err: Error) => {
+          const msg = err.message
+          if (msg.startsWith("start:")) {
+            setGeocodeError(`Could not find "${state.startLocation}". Please check the address and try again.`)
+          } else if (msg.startsWith("end:")) {
+            setGeocodeError(`Could not find "${state.endLocation}". Please check the address and try again.`)
+          } else {
+            setGeocodeError("Failed to look up locations. Please check your connection and try again.")
+          }
+          return null
+        })
+
+        if (!startLatLng || !endLatLng) return
+
+        dispatch({ type: "SET_START_LATLNG", payload: startLatLng })
+        dispatch({ type: "SET_END_LATLNG", payload: endLatLng })
         setProgress(progress + 1)
       } catch {
         setGeocodeError("Failed to look up locations. Please check your connection and try again.")

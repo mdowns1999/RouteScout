@@ -10,12 +10,17 @@ import {
   Rating,
   ToggleButtonGroup,
   ToggleButton,
+  Button,
+  Snackbar,
+  Alert,
 } from "@mui/material"
 import PlaceIcon from "@mui/icons-material/Place"
 import DeleteIcon from "@mui/icons-material/Delete"
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator"
 import ViewListIcon from "@mui/icons-material/ViewList"
 import MapIcon from "@mui/icons-material/Map"
+import SortIcon from "@mui/icons-material/Sort"
+import CloseIcon from "@mui/icons-material/Close"
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd"
 import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
@@ -27,6 +32,8 @@ import { useTripPlan, type Place } from "../../contexts/TripPlanContext"
 import useIsMobile from "../../hooks/useIsMobile"
 import { useState, useMemo } from "react"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
+
+const SUMMARY_DISMISSED_KEY = "routescout_dismissed_summary"
 
 function StopCard({
   stop,
@@ -43,7 +50,7 @@ function StopCard({
     <Card sx={{ display: "flex", alignItems: "flex-start", p: { xs: 1, md: 1.5 }, gap: 1.5 }}>
       <Box
         {...dragHandleProps}
-        sx={{ display: "flex", alignItems: "center", cursor: "grab", p: { xs: 1, md: 0.5 }, color: "text.disabled", alignSelf: "center" }}
+        sx={{ display: "flex", alignItems: "center", cursor: "grab", p: { xs: 1.5, sm: 0.5 }, color: "text.disabled", alignSelf: "center" }}
       >
         <DragIndicatorIcon fontSize="small" />
       </Box>
@@ -95,6 +102,8 @@ function StopCard({
 export default function TripSummary() {
   const isMobile = useIsMobile()
   const [mobileView, setMobileView] = useState<"list" | "map">("list")
+  const [sortSnackbarOpen, setSortSnackbarOpen] = useState(false)
+  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem(SUMMARY_DISMISSED_KEY))
   const { state, dispatch } = useTripPlan()
   const {
     selectedStops,
@@ -111,6 +120,17 @@ export default function TripSummary() {
       type: "SET_SELECTED_STOPS",
       payload: selectedStops.filter((s) => s.id !== id),
     })
+  }
+
+  const handleSortByDistance = () => {
+    const sorted = [...selectedStops].sort((a, b) => a.distanceFromStart - b.distanceFromStart)
+    dispatch({ type: "SET_SELECTED_STOPS", payload: sorted })
+    setSortSnackbarOpen(true)
+  }
+
+  const dismissWelcome = () => {
+    localStorage.setItem(SUMMARY_DISMISSED_KEY, "1")
+    setShowWelcome(false)
   }
 
   const waypoints = useMemo(() => selectedStops.map((s) => s.latLng), [selectedStops])
@@ -168,6 +188,22 @@ export default function TripSummary() {
             overflow: { md: "hidden" },
           }}
         >
+          {/* Welcome card */}
+          {showWelcome && (
+            <Box sx={{ px: 1.5, pt: 1.5 }}>
+              <Card variant="outlined" sx={{ bgcolor: "primary.50", borderColor: "primary.200" }}>
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, p: 1.5, pr: 1 }}>
+                  <Paragraph size="xs" sx={{ flex: 1 }}>
+                    Review your selected stops. Drag to reorder, or tap Optimize to sort them by distance.
+                  </Paragraph>
+                  <IconButton size="small" onClick={dismissWelcome} sx={{ flexShrink: 0, mt: -0.25 }}>
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Card>
+            </Box>
+          )}
+
           {/* Stats strip */}
           <Box
             sx={{
@@ -224,29 +260,43 @@ export default function TripSummary() {
                 No stops selected. Go back to add some!
               </Paragraph>
             ) : (
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="stops">
-                  {(provided) => (
-                    <Stack spacing={1.5} ref={provided.innerRef} {...provided.droppableProps}>
-                      {selectedStops.map((stop, index) => (
-                        <Draggable key={stop.id} draggableId={stop.id} index={index}>
-                          {(provided) => (
-                            <div ref={provided.innerRef} {...provided.draggableProps}>
-                              <StopCard
-                                stop={stop}
-                                index={index}
-                                onRemove={removeStop}
-                                dragHandleProps={provided.dragHandleProps}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </Stack>
-                  )}
-                </Droppable>
-              </DragDropContext>
+              <>
+                {selectedStops.length > 1 && (
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<SortIcon />}
+                      onClick={handleSortByDistance}
+                    >
+                      Optimize Order
+                    </Button>
+                  </Box>
+                )}
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable droppableId="stops">
+                    {(provided) => (
+                      <Stack spacing={1.5} ref={provided.innerRef} {...provided.droppableProps}>
+                        {selectedStops.map((stop, index) => (
+                          <Draggable key={stop.id} draggableId={stop.id} index={index}>
+                            {(provided) => (
+                              <div ref={provided.innerRef} {...provided.draggableProps}>
+                                <StopCard
+                                  stop={stop}
+                                  index={index}
+                                  onRemove={removeStop}
+                                  dragHandleProps={provided.dragHandleProps}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </Stack>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </>
             )}
           </Box>
         </Box>
@@ -276,6 +326,17 @@ export default function TripSummary() {
           </Box>
         </Box>
       </Box>
+
+      <Snackbar
+        open={sortSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSortSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setSortSnackbarOpen(false)} sx={{ width: "100%" }}>
+          Stops sorted by distance from start
+        </Alert>
+      </Snackbar>
     </LayoutBand>
   )
 }

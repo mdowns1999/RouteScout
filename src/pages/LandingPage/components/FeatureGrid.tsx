@@ -82,7 +82,7 @@ export default function FeatureGrid() {
         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={feature.title}>
           <Box css={featureBoxCss}>
             <div css={getIconCircleCss(theme, feature.color)}>{feature.icon}</div>
-            <Heading level="h3" size="h5">
+            <Heading level="h3" size="h5" centered>
               {feature.title}
             </Heading>
             <Paragraph size="sm">{feature.description}</Paragraph>

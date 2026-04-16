@@ -19,7 +19,7 @@ export default function LandingPage() {
           How it Works
         </Heading>
         <Paragraph centered>
-          Three simple steps to create your perfect road trip adventure
+          Four steps to create your perfect road trip adventure
         </Paragraph>
         <Separator />
         <CardGrid />
@@ -48,7 +48,7 @@ export default function LandingPage() {
           Ready to Plan Your Adventure?
         </Heading>
         <Paragraph centered>
-          Ready to find the best stops between here and there?
+          Discover hidden gems, local favorites, and iconic landmarks along your route.
         </Paragraph>
         <Box sx={{ textAlign: "center", py: 2 }}>
           <Button

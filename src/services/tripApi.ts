@@ -2,12 +2,12 @@ import type { TripPlanData } from "../contexts/TripPlanContext"
 
 const BASE = "https://routescoutbackend.onrender.com"
 
-type TripPayload = Omit<TripPlanData, "availableStops" | "tripId">
+type TripPayload = Omit<TripPlanData, "availableStops" | "tripId" | "routeOptions" | "selectedRoute" | "stopFilters">
 
 export async function createTrip(data: TripPlanData): Promise<string> {
   // Strip ephemeral/frontend-only fields before sending
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { availableStops: _a, tripId: _t, ...payload } = data
+  const { availableStops: _a, tripId: _t, routeOptions: _ro, selectedRoute: _sr, stopFilters: _sf, ...payload } = data
 
   const res = await fetch(`${BASE}/api/trips/`, {
     method: "POST",
@@ -37,6 +37,9 @@ export async function getShareTrip(id: string): Promise<TripPlanData> {
   return {
     ...json,
     availableStops: [],
+    routeOptions: [],
+    selectedRoute: null,
+    stopFilters: { minRating: 0, maxPriceLevel: 0, maxDistanceMiles: 0, categoryIds: [] },
     tripId: json.tripId ?? json._id ?? null,
   } as TripPlanData
 }
