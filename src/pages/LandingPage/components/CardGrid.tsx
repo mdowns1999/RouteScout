@@ -30,7 +30,8 @@ const cardWrapper = css`
   padding: 10px;
   border-radius: 5px;
   min-width: 250px;
-  min-height: 275px;
+  height: 100%;
+  box-sizing: border-box;
 `
 
 export default function CardGrid() {
@@ -66,10 +67,11 @@ export default function CardGrid() {
   return (
     <Grid container spacing={3}>
       {cardContent.map((card, index) => (
-        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={card.title}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={card.title} sx={{ display: "flex" }}>
           <Card
             elevation={2}
             sx={{
+              height: "100%",
               backgroundColor: (theme) =>
                 theme.palette.mode === "dark" ? "#000000" : "#ffffff",
               color: (theme) =>
