@@ -26,6 +26,7 @@ import Heading from "../UI/Heading/Heading"
 import Paragraph from "../UI/Paragraph/Paragraph"
 import LayoutBand from "../UI/Layoutband/LayoutBand"
 import { useState } from "react"
+import { buildGoogleMapsUrl, buildAppleMapsUrl, buildGpxBlob, isIOS } from "../../utils/mapExport"
 
 function StopCard({ stop, index }: { stop: Place; index: number }) {
   return (
@@ -83,49 +84,16 @@ export default function TripExport() {
     setSnackbarOpen(true)
   }
 
-  const enc = encodeURIComponent
-
   const handleOpenGoogleMaps = () => {
-    const waypoints = state.selectedStops
-      .map((s) => `${s.latLng.lat},${s.latLng.lng}`)
-      .join("|")
-    const url =
-      `https://www.google.com/maps/dir/?api=1` +
-      `&origin=${enc(state.startLocation)}` +
-      `&destination=${enc(state.endLocation)}` +
-      (waypoints ? `&waypoints=${enc(waypoints)}` : "") +
-      `&travelmode=driving`
-    window.open(url, "_blank", "noopener,noreferrer")
+    window.open(buildGoogleMapsUrl(state.startLocation, state.endLocation, state.selectedStops, isIOS()), "_blank", "noopener,noreferrer")
   }
 
   const handleOpenAppleMaps = () => {
-    const url =
-      `https://maps.apple.com/?saddr=${enc(state.startLocation)}` +
-      `&daddr=${enc(state.endLocation)}`
-    window.open(url, "_blank", "noopener,noreferrer")
+    window.open(buildAppleMapsUrl(state.startLocation, state.endLocation, state.selectedStops), "_blank", "noopener,noreferrer")
   }
 
   const handleExportGPX = () => {
-    const tripName = `${state.startLocation} to ${state.endLocation}`
-    const waypoints = state.selectedStops
-      .map(
-        (s) =>
-          `    <rtept lat="${s.latLng.lat}" lon="${s.latLng.lng}">\n` +
-          `      <name>${s.name}</name>\n` +
-          `      <desc>${s.address}</desc>\n` +
-          `    </rtept>`
-      )
-      .join("\n")
-    const gpx =
-      `<?xml version="1.0" encoding="UTF-8"?>\n` +
-      `<gpx version="1.1" creator="RouteScout">\n` +
-      `  <metadata><name>${tripName}</name></metadata>\n` +
-      `  <rte>\n` +
-      `    <name>${tripName}</name>\n` +
-      waypoints + "\n" +
-      `  </rte>\n` +
-      `</gpx>`
-    const blob = new Blob([gpx], { type: "application/gpx+xml" })
+    const blob = buildGpxBlob(state.startLocation, state.endLocation, state.selectedStops)
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -137,14 +105,18 @@ export default function TripExport() {
     showSnackbar("GPX file downloaded — open it in your GPS app")
   }
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (!state.tripId) {
       showSnackbar("Share link unavailable — trip could not be saved. Try planning again.")
       return
     }
     const shareUrl = `https://mdowns1999.github.io/RouteScout/trip/share/${state.tripId}`
-    navigator.clipboard.writeText(shareUrl)
-    showSnackbar("Link copied to clipboard!")
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      showSnackbar("Link copied to clipboard!")
+    } catch {
+      showSnackbar("Could not copy automatically — share link: " + shareUrl)
+    }
   }
 
   return (
@@ -235,7 +207,7 @@ export default function TripExport() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Tooltip
-              title="Apple Maps doesn't support multiple waypoints — only start and end will be used"
+              title={state.selectedStops.length > 0 ? "Apple Maps doesn't support multiple waypoints — only start and end will be used" : ""}
               placement="top"
             >
               <span style={{ display: "block" }}>

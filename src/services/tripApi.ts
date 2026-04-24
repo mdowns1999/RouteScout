@@ -36,6 +36,10 @@ export async function getShareTrip(id: string): Promise<TripPlanData> {
   const json = await res.json() as TripPlanData & { tripId?: string; _id?: string }
   return {
     ...json,
+    selectedStops: (json.selectedStops ?? []).map((s) => ({
+      ...s,
+      priceLevel: (s as unknown as { priceLevel?: number }).priceLevel ?? 0,
+    })),
     availableStops: [],
     routeOptions: [],
     selectedRoute: null,

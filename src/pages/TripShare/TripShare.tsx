@@ -14,10 +14,12 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material"
 import MapIcon from "@mui/icons-material/Map"
 import DownloadIcon from "@mui/icons-material/Download"
 import PlaceIcon from "@mui/icons-material/Place"
+import { buildGoogleMapsUrl, buildAppleMapsUrl, buildGpxBlob, isIOS } from "../../utils/mapExport"
 import RouteIcon from "@mui/icons-material/Route"
 import AccessTimeIcon from "@mui/icons-material/AccessTime"
 import Heading from "../../components/UI/Heading/Heading"
@@ -79,7 +81,6 @@ function TripShareInner({ trip }: { trip: TripPlanData }) {
   const isMobile = useIsMobile()
   const [snackbarMsg, setSnackbarMsg] = useState("")
   const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const enc = encodeURIComponent
 
   const showSnackbar = (msg: string) => {
     setSnackbarMsg(msg)
@@ -89,44 +90,15 @@ function TripShareInner({ trip }: { trip: TripPlanData }) {
   const waypoints = useMemo(() => trip.selectedStops.map((s) => s.latLng), [trip.selectedStops])
 
   const handleOpenGoogleMaps = () => {
-    const wps = trip.selectedStops.map((s) => `${s.latLng.lat},${s.latLng.lng}`).join("|")
-    const url =
-      `https://www.google.com/maps/dir/?api=1` +
-      `&origin=${enc(trip.startLocation)}` +
-      `&destination=${enc(trip.endLocation)}` +
-      (wps ? `&waypoints=${enc(wps)}` : "") +
-      `&travelmode=driving`
-    window.open(url, "_blank", "noopener,noreferrer")
+    window.open(buildGoogleMapsUrl(trip.startLocation, trip.endLocation, trip.selectedStops, isIOS()), "_blank", "noopener,noreferrer")
   }
 
   const handleOpenAppleMaps = () => {
-    const url =
-      `https://maps.apple.com/?saddr=${enc(trip.startLocation)}` +
-      `&daddr=${enc(trip.endLocation)}`
-    window.open(url, "_blank", "noopener,noreferrer")
+    window.open(buildAppleMapsUrl(trip.startLocation, trip.endLocation, trip.selectedStops), "_blank", "noopener,noreferrer")
   }
 
   const handleExportGPX = () => {
-    const tripName = `${trip.startLocation} to ${trip.endLocation}`
-    const wps = trip.selectedStops
-      .map(
-        (s) =>
-          `    <rtept lat="${s.latLng.lat}" lon="${s.latLng.lng}">\n` +
-          `      <name>${s.name}</name>\n` +
-          `      <desc>${s.address}</desc>\n` +
-          `    </rtept>`
-      )
-      .join("\n")
-    const gpx =
-      `<?xml version="1.0" encoding="UTF-8"?>\n` +
-      `<gpx version="1.1" creator="RouteScout">\n` +
-      `  <metadata><name>${tripName}</name></metadata>\n` +
-      `  <rte>\n` +
-      `    <name>${tripName}</name>\n` +
-      wps + "\n" +
-      `  </rte>\n` +
-      `</gpx>`
-    const blob = new Blob([gpx], { type: "application/gpx+xml" })
+    const blob = buildGpxBlob(trip.startLocation, trip.endLocation, trip.selectedStops)
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -217,9 +189,16 @@ function TripShareInner({ trip }: { trip: TripPlanData }) {
             </Button>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Button variant="outlined" color="primary" size="large" fullWidth startIcon={<MapIcon />} onClick={handleOpenAppleMaps}>
-              Apple Maps
-            </Button>
+            <Tooltip
+              title={trip.selectedStops.length > 0 ? "Apple Maps doesn't support multiple waypoints — only start and end will be used" : ""}
+              placement="top"
+            >
+              <span style={{ display: "block" }}>
+                <Button variant="outlined" color="primary" size="large" fullWidth startIcon={<MapIcon />} onClick={handleOpenAppleMaps}>
+                  Apple Maps
+                </Button>
+              </span>
+            </Tooltip>
           </Grid>
         </Grid>
 
